@@ -1,0 +1,14 @@
+import "../components/Navbars.js";
+import "../components/Tables.js";
+import "../components/Cards.js";
+import "../components/Pagination.js";
+import "../components/Buttons.js";
+import "../components/EventosCW.js";
+import "../components/EventoP.js";
+import "../components/FirstElement.js";
+import "../components/SecondElement.js";
+import "../components/Root.js";
+import "../components/Masthead.js";
+import "../components/Jumbo.js";
+import "../components/Quiz.js";
+import "../components/Reactive.js";
