@@ -1,50 +1,36 @@
 class Quiz extends HTMLElement {
-    quizData = [
-        {
-            question: "What is the capital of France?",
-            options: ["London", "Berlin", "Paris", "Madrid"],
-            correct: 2
-        },
-        {
-            question: "Which planet is known as the Red Planet?",
-            options: ["Venus", "Mars", "Jupiter", "Saturn"],
-            correct: 1
-        },
-        {
-            question: "Who painted the Mona Lisa?",
-            options: ["Vincent van Gogh", "Pablo Picasso", "Leonardo da Vinci", "Michelangelo"],
-            correct: 2
-        },
-        {
-            question: "What is the largest ocean on Earth?",
-            options: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
-            correct: 3
-        },
-        {
-            question: "Which element has the chemical symbol 'O'?",
-            options: ["Gold", "Silver", "Oxygen", "Iron"],
-            correct: 2
-        }
-    ];
-    
+    quizData = [];
     currentQuestion = 0;
     score = 0;
     timer;
     timeLeft = 30;
-    
+
     questionEl = "";
     optionsEl = "";
     nextBtn = "";
     timerEl = "";
     progressBar = "";
     quizContainer = "";
-      
-   
+
+    async fetchQuizData() {
+        try {
+            const response = await fetch('http://localhost:3000/api/questions/materia/SQL?limit=5&random=true'); // Replace with your API endpoint
+            if (!response.ok) {
+                throw new Error(`Failed to fetch quiz data: ${response.statusText}`);
+            }
+            this.quizData = await response.json();
+            this.loadQuestion();
+        } catch (error) {
+            console.error(error);
+            this.quizContainer.innerHTML = `<p class="error">Failed to load quiz data. Please try again later.</p>`;
+        }
+    }
+
     loadQuestion() {
         const question = this.quizData[this.currentQuestion];
-        this.questionEl.textContent = question.question;
+        this.questionEl.textContent = question.pregunta;
         this.optionsEl.innerHTML = '';
-        question.options.forEach((option, index) => {
+        question.opciones.forEach((option, index) => {
             const button = document.createElement('button');
             button.textContent = option;
             button.classList.add('option');
@@ -57,14 +43,14 @@ class Quiz extends HTMLElement {
         this.startTimer();
         this.updateProgress();
     }
-    
+
     selectOption(selectedButton, optionIndex) {
         const buttons = this.optionsEl.getElementsByClassName('option');
         Array.from(buttons).forEach(button => button.classList.remove('selected'));
         selectedButton.classList.add('selected');
         this.nextBtn.style.display = 'block';
     }
-    
+
     startTimer() {
         this.timer = setInterval(() => {
             this.timeLeft--;
@@ -75,32 +61,32 @@ class Quiz extends HTMLElement {
             }
         }, 1000);
     }
-    
+
     checkAnswer() {
         const selectedOption = this.querySelector('.option.selected');
         if (!selectedOption) return;
-    
+
         const selectedAnswer = Array.from(this.optionsEl.children).indexOf(selectedOption);
         const question = this.quizData[this.currentQuestion];
-    
-        if (selectedAnswer === question.correct) {
+
+        if (selectedAnswer === question.respuesta) {
             this.score++;
             selectedOption.classList.add('correct');
         } else {
             selectedOption.classList.add('incorrect');
-            this.optionsEl.children[question.correct].classList.add('correct');
+            this.optionsEl.children[question.respuesta].classList.add('correct');
         }
-    
+
         Array.from(this.optionsEl.children).forEach(button => button.disabled = true);
         clearInterval(this.timer);
     }
-    
+
     updateProgress() {
         const progress = ((this.currentQuestion + 1) / this.quizData.length) * 100;
         this.progressBar.style.width = `${progress}%`;
         this.progressBar.setAttribute('aria-valuenow', progress);
     }
-    
+
     showResults() {
         this.quizContainer.innerHTML = `
                     <div class="results">
@@ -113,7 +99,7 @@ class Quiz extends HTMLElement {
                     </div>
                 `;
     }
-   
+
     constructor() {
         super();
     }
@@ -142,8 +128,9 @@ class Quiz extends HTMLElement {
                 this.showResults();
             }
         });
-        
-        this.loadQuestion(); 
+
+        // Fetch quiz data dynamically
+        this.fetchQuizData();
     }
 
     render() {
