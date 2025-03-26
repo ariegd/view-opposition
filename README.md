@@ -478,3 +478,120 @@ customElements.define("tag-quiz", Quiz);
 
 3. **Flexibility**:
    - This approach allows the `Cards` component to handle both `data-materia` and `data-programa` seamlessly.
+
+
+## To change value limit=5 by this.data.message
+To dynamically set the `limit` parameter in the API endpoint using `this.data.message`, you can modify the `startQuiz` method in the `Cards` component. Here's how:
+
+### Updated /home/zodd/Documentos/@Documentos/Master2024/curso 2024/2595_MEAN_ALUMNOS/MEAN/05_MEAN/04_Oposicion/view-opposition/src/components/Cards.js
+
+```javascript
+class Cards extends HTMLElement {
+    constructor() {
+        super();
+        this.data = {};
+        this.data.message = '25'; // Default value for the limit
+    }
+
+    handleEvent(event) {
+        if (event.type === "user:jumbo-input") {
+            this.data = event.detail;
+            this.render();
+        }
+    }
+
+    static get styles() {
+        return /*css*/ `  
+        `;
+    }
+
+    connectedCallback() {
+        document.addEventListener("user:jumbo-input", this);
+        this.render();
+        this.addEventListeners();
+    }
+
+    disconnectedCallback() {
+        document.removeEventListener("user:jumbo-input", this);
+    }
+
+    addEventListeners() {
+        const buttons = this.querySelectorAll('.btn-success');
+        buttons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const materia = event.target.getAttribute('data-materia'); // Get the data-materia attribute
+                const programa = event.target.getAttribute('data-programa'); // Get the data-programa attribute
+                this.startQuiz(materia, programa); // Pass both attributes to startQuiz
+            });
+        });
+    }
+
+    startQuiz(materia, programa) {
+        // Use this.data.message as the limit
+        const limit = this.data.message;
+
+        // Determine the API endpoint based on the attribute
+        const endpoint = materia
+            ? `/api/questions/materia/${materia}?limit=${limit}&random=true`
+            : `/api/questions/programa/${programa}?limit=${limit}&random=true`;
+
+        // Remove the current Cards component
+        this.innerHTML = '';
+
+        // Create and append the Quiz component
+        const quiz = document.createElement('tag-quiz');
+        quiz.setAttribute('endpoint', endpoint); // Pass the endpoint to the Quiz component
+        document.body.appendChild(quiz);
+    }
+
+    render() {
+        this.innerHTML = /*html*/ `
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card text-white bg-primary mb-3" style="max-width: 20rem;">
+                    <div class="card-header">Header</div>
+                    <div class="card-body">
+                        <h4 class="card-title">Organización del Estado</h4>
+                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
+                        <button type="button" class="btn btn-success" data-programa="ag">Start Quiz</button>
+                    </div>
+                </div>
+                <div class="card text-white bg-secondary mb-3" style="max-width: 20rem;">
+                    <div class="card-header">Header</div>
+                    <div class="card-body">
+                        <h4 class="card-title">Sistemas y Comunicaciones</h4>
+                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
+                        <button type="button" class="btn btn-success" data-programa="sc">Start Quiz</button>
+                    </div>
+                </div>
+                <div class="card bg-light mb-3" style="max-width: 20rem;">
+                    <div class="card-header">Header</div>
+                    <div class="card-body">
+                        <h4 class="card-title">Estructura de Datos</h4>
+                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
+                        <button type="button" class="btn btn-success" data-materia="ED">Start Quiz</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Add more cards as needed -->
+        </div>
+        `;
+    }
+}
+
+customElements.define("tag-card", Cards);
+```
+
+---
+
+### Explanation:
+1. **Dynamic Limit**:
+   - The `limit` parameter in the API endpoint is dynamically set using `this.data.message`.
+
+2. **API Endpoint**:
+   - The `startQuiz` method constructs the endpoint with the dynamic `limit` value.
+
+3. **Flexibility**:
+   - This approach allows the `limit` to be adjusted dynamically based on the `this.data.message` value.
+
+Made changes.

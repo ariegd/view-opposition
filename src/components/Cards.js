@@ -2,7 +2,7 @@ class Cards extends HTMLElement {
     constructor() {
         super();
         this.data = {};
-        this.data.message = '25';
+        this.data.message = '25'; // Default value for the limit
     }
 
     handleEvent(event) {
@@ -32,17 +32,21 @@ class Cards extends HTMLElement {
         buttons.forEach(button => {
             button.addEventListener('click', (event) => {
                 const materia = event.target.getAttribute('data-materia'); // Get the data-materia attribute
-                const programa = event.target.getAttribute('data-programa'); // Get the data-pregunta attribute
+                const programa = event.target.getAttribute('data-programa'); // Get the data-programa attribute
                 this.startQuiz(materia, programa); // Pass both attributes to startQuiz
             });
         });
     }
 
     startQuiz(materia, programa) {
+        // Use this.data.message as the limit
+        const limit = this.data.message;
+        console.log('limit', limit);
+
         // Determine the API endpoint based on the attribute
         const endpoint = materia
-            ? `/api/questions/materia/${materia}?limit=5&random=true`
-            : `/api/questions/programa/${programa}?limit=5&random=true`;
+            ? `/api/questions/materia/${materia}?limit=${limit}&random=true`
+            : `/api/questions/programa/${programa}?limit=${limit}&random=true`;
 
         // Remove the current Cards component
         this.innerHTML = '';
