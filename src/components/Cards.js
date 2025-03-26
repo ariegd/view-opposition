@@ -7,8 +7,9 @@ class Cards extends HTMLElement {
 
     handleEvent(event) {
         if (event.type === "user:jumbo-input") {
-            this.data = event.detail;
-            this.render();
+            this.data = event.detail; // Update data from the event
+            this.render(); // Re-render the component
+            this.addEventListeners(); // Re-attach event listeners
         }
     }
 
@@ -18,7 +19,7 @@ class Cards extends HTMLElement {
     }
 
     connectedCallback() {
-        document.addEventListener("user:jumbo-input", this);
+        document.addEventListener("user:jumbo-input", this); // Listen for updates from Jumbo.js
         this.render();
         this.addEventListeners();
     }
