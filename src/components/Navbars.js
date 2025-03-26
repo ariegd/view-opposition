@@ -43,7 +43,6 @@ class Navbars extends HTMLElement {
     connectedCallback() {
         this.render();
         this.ass = this.querySelectorAll("a.dropdown-item");
-        console.log("ass: "+ this.ass[0]);
         this.ass[0].addEventListener("click", this.sendCustomEvent1);
         this.ass[1].addEventListener("click", this.sendCustomEvent2);
         this.ass[2].addEventListener("click", this.sendCustomEvent3);

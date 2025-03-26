@@ -31,19 +31,25 @@ class Cards extends HTMLElement {
         const buttons = this.querySelectorAll('.btn-success');
         buttons.forEach(button => {
             button.addEventListener('click', (event) => {
-                const materia = event.target.getAttribute('data-materia'); // Get the materia from the button
-                this.startQuiz(materia);
+                const materia = event.target.getAttribute('data-materia'); // Get the data-materia attribute
+                const programa = event.target.getAttribute('data-programa'); // Get the data-pregunta attribute
+                this.startQuiz(materia, programa); // Pass both attributes to startQuiz
             });
         });
     }
 
-    startQuiz(materia) {
+    startQuiz(materia, programa) {
+        // Determine the API endpoint based on the attribute
+        const endpoint = materia
+            ? `/api/questions/materia/${materia}?limit=5&random=true`
+            : `/api/questions/programa/${programa}?limit=5&random=true`;
+
         // Remove the current Cards component
         this.innerHTML = '';
 
         // Create and append the Quiz component
         const quiz = document.createElement('tag-quiz');
-        quiz.setAttribute('materia', materia); // Pass the materia to the Quiz component
+        quiz.setAttribute('endpoint', endpoint); // Pass the endpoint to the Quiz component
         document.body.appendChild(quiz);
     }
 
@@ -56,7 +62,7 @@ class Cards extends HTMLElement {
                     <div class="card-body">
                         <h4 class="card-title">Organización del Estado</h4>
                         <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                        <button type="button" class="btn btn-success" data-materia="Organización del Estado">Start Quiz</button>
+                        <button type="button" class="btn btn-success" data-programa="ag">Start Quiz</button>
                     </div>
                 </div>
                 <div class="card text-white bg-secondary mb-3" style="max-width: 20rem;">
@@ -64,7 +70,7 @@ class Cards extends HTMLElement {
                     <div class="card-body">
                         <h4 class="card-title">Sistemas y Comunicaciones</h4>
                         <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                        <button type="button" class="btn btn-success" data-materia="Sistemas y Comunicaciones">Start Quiz</button>
+                        <button type="button" class="btn btn-success" data-programa="sc">Start Quiz</button>
                     </div>
                 </div>
                 <div class="card bg-light mb-3" style="max-width: 20rem;">
@@ -72,7 +78,7 @@ class Cards extends HTMLElement {
                     <div class="card-body">
                         <h4 class="card-title">Estructura de Datos</h4>
                         <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                        <button type="button" class="btn btn-success" data-materia="Estructura de Datos">Start Quiz</button>
+                        <button type="button" class="btn btn-success" data-materia="ED">Start Quiz</button>
                     </div>
                 </div>
             </div>
@@ -82,7 +88,7 @@ class Cards extends HTMLElement {
                     <div class="card-body">
                         <h4 class="card-title">Tecnología básica</h4>
                         <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                        <button type="button" class="btn btn-success" data-materia="Tecnología básica">Start Quiz</button>
+                        <button type="button" class="btn btn-success" data-programa="tb">Start Quiz</button>
                     </div>
                 </div>
                 <div class="card text-white bg-warning mb-3" style="max-width: 20rem;">
@@ -108,7 +114,7 @@ class Cards extends HTMLElement {
                     <div class="card-body">
                         <h4 class="card-title">Desarrollo de sistemas</h4>
                         <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                        <button type="button" class="btn btn-success" data-materia="Desarrollo de sistemas">Start Quiz</button>
+                        <button type="button" class="btn btn-success" data-programa="ds">Start Quiz</button>
                     </div>
                 </div>
                 <div class="card text-white bg-dark mb-3" style="max-width: 20rem;">
@@ -116,7 +122,7 @@ class Cards extends HTMLElement {
                     <div class="card-body">
                         <h4 class="card-title">Díagramas</h4>
                         <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                        <button type="button" class="btn btn-success" data-materia="Díagramas">Start Quiz</button>
+                        <button type="button" class="btn btn-success" data-materia="UML">Start Quiz</button>
                     </div>
                 </div>
                 <div class="card text-white bg-danger mb-3" style="max-width: 20rem;">

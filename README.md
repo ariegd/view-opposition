@@ -300,3 +300,181 @@ customElements.define("tag-quiz", Quiz);
 Made changes.
 
 Similar code found with 1 license type
+
+## Fetch question from data-materia and data-programa
+To handle both `data-materia` and `data-programa` attributes and dynamically fetch questions from either `/api/questions/materia/${materia}?limit=5&random=true` or `/api/questions/programa/${programa}?limit=5&random=true`, you can modify the `startQuiz` method to determine which attribute is present and construct the appropriate API endpoint.
+
+### Steps:
+1. Update the `addEventListeners` method to handle both `data-materia` and `data-programa`.
+2. Modify the `startQuiz` method to dynamically determine the API endpoint based on the attribute.
+3. Pass the correct endpoint to the `Quiz` component.
+
+### Updated /home/zodd/Documentos/@Documentos/Master2024/curso 2024/2595_MEAN_ALUMNOS/MEAN/05_MEAN/04_Oposicion/view-opposition/src/components/Cards.js
+
+```javascript
+class Cards extends HTMLElement {
+    constructor() {
+        super();
+        this.data = {};
+        this.data.message = '25';
+    }
+
+    handleEvent(event) {
+        if (event.type === "user:jumbo-input") {
+            this.data = event.detail;
+            this.render();
+        }
+    }
+
+    static get styles() {
+        return /*css*/ `  
+        `;
+    }
+
+    connectedCallback() {
+        document.addEventListener("user:jumbo-input", this);
+        this.render();
+        this.addEventListeners();
+    }
+
+    disconnectedCallback() {
+        document.removeEventListener("user:jumbo-input", this);
+    }
+
+    addEventListeners() {
+        const buttons = this.querySelectorAll('.btn-success');
+        buttons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const materia = event.target.getAttribute('data-materia'); // Get the data-materia attribute
+                const programa = event.target.getAttribute('data-programa'); // Get the data-programa attribute
+                this.startQuiz(materia, programa); // Pass both attributes to startQuiz
+            });
+        });
+    }
+
+    startQuiz(materia, pregunta) {
+        // Determine the API endpoint based on the attribute
+        const endpoint = materia
+            ? `/api/questions/materia/${materia}?limit=5&random=true`
+            : `/api/questions/programa/${programa}?limit=5&random=true`;
+
+        // Remove the current Cards component
+        this.innerHTML = '';
+
+        // Create and append the Quiz component
+        const quiz = document.createElement('tag-quiz');
+        quiz.setAttribute('endpoint', endpoint); // Pass the endpoint to the Quiz component
+        document.body.appendChild(quiz);
+    }
+
+    render() {
+        this.innerHTML = /*html*/ `
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card text-white bg-primary mb-3" style="max-width: 20rem;">
+                    <div class="card-header">Header</div>
+                    <div class="card-body">
+                        <h4 class="card-title">Organización del Estado</h4>
+                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
+                        <button type="button" class="btn btn-success" data-programa="Organización del Estado">Start Quiz</button>
+                    </div>
+                </div>
+                <div class="card text-white bg-secondary mb-3" style="max-width: 20rem;">
+                    <div class="card-header">Header</div>
+                    <div class="card-body">
+                        <h4 class="card-title">Sistemas y Comunicaciones</h4>
+                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
+                        <button type="button" class="btn btn-success" data-programa="Sistemas y Comunicaciones">Start Quiz</button>
+                    </div>
+                </div>
+                <!-- Add more cards as needed -->
+            </div>
+        </div>
+        `;
+    }
+}
+
+customElements.define("tag-card", Cards);
+```
+
+---
+
+### Updated /home/zodd/Documentos/@Documentos/Master2024/curso 2024/2595_MEAN_ALUMNOS/MEAN/05_MEAN/04_Oposicion/view-opposition/src/components/Quiz.js
+
+Modify the `Quiz` component to accept the `endpoint` attribute and fetch questions dynamically based on it.
+
+```javascript
+
+
+Made changes.
+
+class Quiz extends HTMLElement {
+    quizData = [];
+    currentQuestion = 0;
+    score = 0;
+    timer;
+    timeLeft = 30;
+
+    questionEl = "";
+    optionsEl = "";
+    nextBtn = "";
+    timerEl = "";
+    progressBar = "";
+    quizContainer = "";
+
+    async fetchQuizData(endpoint) {
+        try {
+            const response = await fetch(endpoint); // Use the endpoint passed as an attribute
+            if (!response.ok) {
+                throw new Error(`Failed to fetch quiz data: ${response.statusText}`);
+            }
+            this.quizData = await response.json();
+            this.loadQuestion();
+        } catch (error) {
+            console.error(error);
+            this.quizContainer.innerHTML = `<p class="error">Failed to load quiz data. Please try again later.</p>`;
+        }
+    }
+
+    connectedCallback() {
+        this.render();
+
+        this.questionEl = document.getElementById('question');
+        this.optionsEl = document.getElementById('options');
+        this.nextBtn = document.getElementById('next-btn');
+        this.timerEl = document.getElementById('timer');
+        this.progressBar = document.querySelector('.progress-bar');
+        this.quizContainer = document.getElementById('quiz');
+
+        this.nextBtn.addEventListener('click', () => {
+            this.checkAnswer();
+            this.currentQuestion++;
+            if (this.currentQuestion < this.quizData.length) {
+                this.loadQuestion();
+            } else {
+                this.showResults();
+            }
+        });
+
+        const endpoint = this.getAttribute('endpoint'); // Get the endpoint from the attribute
+        this.fetchQuizData(endpoint); // Fetch quiz data from the specified endpoint
+    }
+
+    // ...existing methods...
+}
+
+customElements.define("tag-quiz", Quiz);
+```
+
+---
+
+### Explanation:
+1. **Dynamic Endpoint**:
+   - The `startQuiz` method determines the API endpoint based on whether `data-materia` or `data-programa` is present.
+   - The endpoint is passed to the `Quiz` component as an attribute.
+
+2. **Quiz Component**:
+   - The `Quiz` component fetches questions dynamically using the `endpoint` attribute.
+
+3. **Flexibility**:
+   - This approach allows the `Cards` component to handle both `data-materia` and `data-programa` seamlessly.

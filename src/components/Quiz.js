@@ -12,9 +12,9 @@ class Quiz extends HTMLElement {
     progressBar = "";
     quizContainer = "";
 
-    async fetchQuizData(materia) {
+    async fetchQuizData(endpoint) {
         try {
-            const response = await fetch(`http://localhost:3000/api/questions/materia/${materia}?limit=5&random=true`);
+            const response = await fetch('http://localhost:3000' + endpoint); // Use the endpoint passed as an attribute
             if (!response.ok) {
                 throw new Error(`Failed to fetch quiz data: ${response.statusText}`);
             }
@@ -129,8 +129,8 @@ class Quiz extends HTMLElement {
             }
         });
 
-        const materia = this.getAttribute('materia'); // Get the materia from the attribute
-        this.fetchQuizData(materia); // Fetch quiz data for the specified materia
+        const endpoint = this.getAttribute('endpoint'); // Get the endpoint from the attribute
+        this.fetchQuizData(endpoint); // Fetch quiz data from the specified endpoint
     }
 
     render() {
