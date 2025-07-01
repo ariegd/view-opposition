@@ -87,17 +87,40 @@ class Quiz extends HTMLElement {
         this.progressBar.setAttribute('aria-valuenow', progress);
     }
 
+    async saveScore() {
+        try {
+            const username = prompt('Enter your username:'); // Prompt user for their name
+            const score = `${this.score}/${this.quizData.length}`;
+            const response = await fetch('http://localhost:3000/api/users/score', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, score })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to save score');
+            }
+
+            console.log('Score saved successfully');
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     showResults() {
         this.quizContainer.innerHTML = `
-                    <div class="results">
-                        <div class="result-icon">
-                            <i class="fas ${this.score > this.quizData.length / 2 ? 'fa-trophy text-success' : 'fa-times-circle text-danger'}"></i>
-                        </div>
-                        <div class="score">Your score: ${this.score}/${this.quizData.length}</div>
-                        <p>${this.score > this.quizData.length / 2 ? 'Great job!' : 'Better luck next time!'}</p>
-                        <button class="btn btn-primary" onclick="location.reload()">Restart Quiz</button>
-                    </div>
-                `;
+            <div class="results">
+                <div class="result-icon">
+                    <i class="fas ${this.score > this.quizData.length / 2 ? 'fa-trophy text-success' : 'fa-times-circle text-danger'}"></i>
+                </div>
+                <div class="score">Your score: ${this.score}/${this.quizData.length}</div>
+                <p>${this.score > this.quizData.length / 2 ? 'Great job!' : 'Better luck next time!'}</p>
+                <button class="btn btn-primary" id="save-score-btn">Save Score</button>
+                <button class="btn btn-secondary" onclick="location.reload()">Restart Quiz</button>
+            </div>
+        `;
+
+        document.getElementById('save-score-btn').addEventListener('click', () => this.saveScore());
     }
 
     constructor() {
