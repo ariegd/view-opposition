@@ -4,7 +4,7 @@ Vista del proyecto relacionado con los test de oposición. Utilizando bootswatch
 
 ### [Tables.js](file:///home/zodd/Documentos/%40Documentos/Master2024/curso%202024/2595_MEAN_ALUMNOS/MEAN/05_MEAN/04_Oposicion/view-opposition/src/components/Tables.js)
 
-##Cómo crear hiperlink a otro componente deste el componente tables?
+## Cómo crear hiperlink a otro componente deste el componente tables?
 
 Para crear un hiperlink a otro componente desde el componente `Tables`, puedes envolver el contenido de la celda con un `<a>` y, al hacer clic, disparar una función que monte el componente deseado (por ejemplo, usando un evento o manipulando el DOM).
 

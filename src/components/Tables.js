@@ -5,7 +5,33 @@ class Tables extends HTMLElement {
 
     static get styles() {
         return /*css*/ `  
+        tag-table {
+          display: block;
+          min-height: 100vh;
+        }
         `;
+    }
+
+    addEventListeners() {
+        // Selecciona todos los enlaces de libros
+        const links = this.querySelectorAll('.book-link');
+        links.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Quita la tabla
+                this.innerHTML = '';
+                const container = document.createElement('div');
+                container.className = 'd-flex justify-content-center align-items-center';
+                container.style.minHeight = '60vh'; // Opcional: altura mínima para centrar verticalmente
+
+                // Monta el componente de detalle (por ejemplo, tag-card)
+                const detail = document.createElement('tag-card');
+                detail.setAttribute('title', link.textContent);
+
+                container.appendChild(detail);
+                this.appendChild(container); // <-- Añade el contenedor al propio componente
+            });
+        });
     }
 
     connectedCallback() {
@@ -13,30 +39,15 @@ class Tables extends HTMLElement {
         this.addEventListeners();
     }
 
-    addEventListeners() {
-        // Ejemplo: para el primer libro
-        const link = this.querySelector('.book-link');
-        if (link) {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                // Quita la tabla y monta el componente de detalle
-                this.innerHTML = '';
-                const detail = document.createElement('tag-book-detail');
-                detail.setAttribute('title', link.textContent);
-                document.body.appendChild(detail);
-            });
-        }
-    }
-
     render() {
         this.innerHTML = /*html*/ `
             <table class="table table-hover">
                 <thead>
                     <tr>
-                    <th scope="col">Libro</th>
-                    <th scope="col">Asignatura</th>
-                    <th scope="col">Materia</th>
-                    <th scope="col">Curso</th>
+                        <th scope="col">Libro</th>
+                        <th scope="col">Asignatura</th>
+                        <th scope="col">Materia</th>
+                        <th scope="col">Curso</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -221,6 +232,11 @@ class Tables extends HTMLElement {
             </table>
         `;
     }
+
+    disconnectedCallback() {
+        this.ass[1].removeEventListener("click", this.sendCustomEvent1);
+    }
+
 }
 
 customElements.define("tag-table", Tables);
