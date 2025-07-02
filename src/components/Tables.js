@@ -10,6 +10,22 @@ class Tables extends HTMLElement {
 
     connectedCallback() {
         this.render();
+        this.addEventListeners();
+    }
+
+    addEventListeners() {
+        // Ejemplo: para el primer libro
+        const link = this.querySelector('.book-link');
+        if (link) {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Quita la tabla y monta el componente de detalle
+                this.innerHTML = '';
+                const detail = document.createElement('tag-book-detail');
+                detail.setAttribute('title', link.textContent);
+                document.body.appendChild(detail);
+            });
+        }
     }
 
     render() {
@@ -25,7 +41,9 @@ class Tables extends HTMLElement {
                 </thead>
                 <tbody>
                     <tr class="table-active">
-                        <th scope="row">Digital Design and Computer Architecture, ARM Edition</th>
+                        <th scope="row">
+                            <a href="#" class="book-link">Digital Design and Computer Architecture, ARM Edition</a>
+                        </th>
                         <td>608899 - Arquitectura del nodo IoT</td>
                         <td>Tecnología</td>
                         <td>1º ( 1C )</td>

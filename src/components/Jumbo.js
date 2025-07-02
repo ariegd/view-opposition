@@ -2,7 +2,7 @@ class Jumbotron extends HTMLElement {
     constructor() {
         super();
         this.data = {};
-        this.data.message = "Jumbotron Example";
+        this.data.message = "Máster Universitario en Internet de las Cosas";
     }
 
     handleEvent(event) {
@@ -47,7 +47,7 @@ class Jumbotron extends HTMLElement {
             <div class="container mt-3">
                 <div class="mt-4 p-5 bg-info text-white rounded">
                     <h1>${this.data.message}</h1> 
-                    <p>Bienvenido a la plantilla de realizar test en el programa oposición Técnico Auxiliar de Informática de la Administración del Estado</p> 
+                    <p>Coordinador: Francisco Igual Peña (figual@ucm.es),   <a href="https://informatica.ucm.es/master-en-internet-de-las-cosas" target="_blank" style="color: white;">Web oficial del máster</a>  </p> 
                 </div>
             </div> `;
     }

@@ -1,6 +1,83 @@
 # view-opposition
 Vista del proyecto relacionado con los test de oposición. Utilizando bootswatch (basic) y web componentes. 
 
+
+### [Tables.js](file:///home/zodd/Documentos/%40Documentos/Master2024/curso%202024/2595_MEAN_ALUMNOS/MEAN/05_MEAN/04_Oposicion/view-opposition/src/components/Tables.js)
+
+##Cómo crear hiperlink a otro componente deste el componente tables?
+
+Para crear un hiperlink a otro componente desde el componente `Tables`, puedes envolver el contenido de la celda con un `<a>` y, al hacer clic, disparar una función que monte el componente deseado (por ejemplo, usando un evento o manipulando el DOM).
+
+Aquí tienes un ejemplo básico que convierte el título del libro en un enlace que, al hacer clic, reemplaza la tabla por un componente `<tag-book-detail>` (debes tener este componente creado):
+
+````javascript
+class Tables extends HTMLElement {
+    constructor() {
+        super();
+    }
+
+    static get styles() {
+        return /*css*/ `  
+        `;
+    }
+
+    connectedCallback() {
+        this.render();
+        this.addEventListeners();
+    }
+
+    addEventListeners() {
+        // Ejemplo: para el primer libro
+        const link = this.querySelector('.book-link');
+        if (link) {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Quita la tabla y monta el componente de detalle
+                this.innerHTML = '';
+                const detail = document.createElement('tag-book-detail');
+                detail.setAttribute('title', link.textContent);
+                document.body.appendChild(detail);
+            });
+        }
+    }
+
+    render() {
+        this.innerHTML = /*html*/ `
+            <table class="table table-hover">
+                <thead>
+                    <!-- ...existing code... -->
+                </thead>
+                <tbody>
+                    <tr class="table-active">
+                        <th scope="row">
+                            <a href="#" class="book-link">Digital Design and Computer Architecture, ARM Edition</a>
+                        </th>
+                        <td>608899 - Arquitectura del nodo IoT</td>
+                        <td>Tecnología</td>
+                        <td>1º ( 1C )</td>
+                    </tr>
+                    <!-- ...existing code... -->
+                </tbody>
+            </table>
+        `;
+    }
+}
+
+customElements.define("tag-table", Tables);
+````
+
+**Explicación:**  
+- Se ha envuelto el título del libro en un `<a href="#" class="book-link">...</a>`.
+- En `addEventListeners`, se añade un listener al enlace para que, al hacer clic, se reemplace la tabla por un componente de detalle (`<tag-book-detail>`).
+- Puedes adaptar el nombre del componente y los atributos según tus necesidades.
+
+Si quieres que el enlace navegue a otra ruta o cambie el contenido de una SPA, puedes usar eventos personalizados o manipular el router si tienes uno.
+
+
+
+
+
+
 To make the `quizData` array dynamic and fetch its content from a RESTful API, you can use `fetch` or any HTTP client (e.g., `axios`) to retrieve the data from your backend. Here's how you can modify the `Quiz` component to load `quizData` dynamically:
 
 ### Steps:
