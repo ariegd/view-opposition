@@ -1,6 +1,94 @@
 # view-opposition
 Vista del proyecto relacionado con los test de oposición. Utilizando bootswatch (basic) y web componentes. 
 
+## Un bucle que me cree dinamicamente todos los elementos del <tbody> junto con su CustomenEvent
+
+Claro, aquí tienes un ejemplo de cómo generar dinámicamente todas las filas del `<tbody>` a partir de un array de datos y añadir el evento personalizado a cada enlace de libro:
+
+```javascript
+class Tables extends HTMLElement {
+    constructor() {
+        super();
+        // Ejemplo de datos, puedes cargarlo dinámicamente si lo necesitas
+        this.books = [
+            {
+                title: "Digital Design and Computer Architecture, ARM Edition",
+                asignatura: "608899 - Arquitectura del nodo IoT",
+                materia: "Tecnología",
+                curso: "1º ( 1C )",
+                rowClass: "table-active"
+            },
+            {
+                title: "Computer Architecture- A Quantitative Approach",
+                asignatura: "608899 - Arquitectura del nodo IoT",
+                materia: "Tecnología",
+                curso: "1º ( 1C )",
+                rowClass: ""
+            },
+            // ...añade el resto de tus libros aquí...
+        ];
+    }
+
+    connectedCallback() {
+        this.render();
+        this.addEventListeners();
+    }
+
+    addEventListeners() {
+        // Añade el evento personalizado a cada enlace de libro
+        const links = this.querySelectorAll('.book-link');
+        links.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const title = link.textContent;
+                // Lanza el CustomEvent con el título del libro
+                this.dispatchEvent(new CustomEvent("tables:book-selected", {
+                    detail: { from: "book-link", message: title },
+                    bubbles: true,
+                    composed: true
+                }));
+            });
+        });
+    }
+
+    render() {
+        this.innerHTML = /*html*/ `
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Libro</th>
+                        <th scope="col">Asignatura</th>
+                        <th scope="col">Materia</th>
+                        <th scope="col">Curso</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${this.books.map(book => `
+                        <tr class="${book.rowClass}">
+                            <th scope="row">
+                                <a href="#" class="book-link">${book.title}</a>
+                            </th>
+                            <td>${book.asignatura}</td>
+                            <td>${book.materia}</td>
+                            <td>${book.curso}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+    }
+}
+
+customElements.define("tag-table", Tables);
+```
+
+**¿Qué hace este código?**
+- Genera dinámicamente todas las filas del `<tbody>` usando `Array.map`.
+- Cada título de libro es un enlace con la clase `.book-link`.
+- Después de renderizar, se añaden los listeners a cada enlace para lanzar un `CustomEvent` con el título del libro seleccionado.
+
+Puedes escuchar el evento `tables:book-selected` en el componente padre o donde lo necesites para mostrar detalles, cambiar el jumbotron, etc.
+
 ## Pasando un valor del componente Root.js a Cards.js
 
 Para pasar el valor `"book-link"` (o cualquier otro dato, como el título del libro) al componente `<tag-card/>`, simplemente añade un atributo personalizado en el HTML generado y usa el valor de `this.data`:
@@ -89,10 +177,6 @@ customElements.define("tag-table", Tables);
 - Puedes adaptar el nombre del componente y los atributos según tus necesidades.
 
 Si quieres que el enlace navegue a otra ruta o cambie el contenido de una SPA, puedes usar eventos personalizados o manipular el router si tienes uno.
-
-
-
-
 
 
 To make the `quizData` array dynamic and fetch its content from a RESTful API, you can use `fetch` or any HTTP client (e.g., `axios`) to retrieve the data from your backend. Here's how you can modify the `Quiz` component to load `quizData` dynamically:

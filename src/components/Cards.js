@@ -261,8 +261,6 @@ class Cards extends HTMLElement {
     }
 
     render() {
-        console.log('this.data.message: ', this.data.message);
-        console.log('this.data.from: ', this.data.from);
         this.innerHTML = (this.data.from === "Ejercicios")?this.hasOppositions():this.hasBooks();
 
     }

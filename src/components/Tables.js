@@ -1,6 +1,24 @@
 class Tables extends HTMLElement {
     constructor() {
         super();
+        // Ejemplo de datos, puedes cargarlo dinámicamente si lo necesitas
+        this.books = [
+            {
+                title: "Digital Design and Computer Architecture, ARM Edition",
+                asignatura: "608899 - Arquitectura del nodo IoT",
+                materia: "Tecnología",
+                curso: "1º ( 1C )",
+                rowClass: "table-active"
+            },
+            {
+                title: "Computer Architecture- A Quantitative Approach",
+                asignatura: "608899 - Arquitectura del nodo IoT",
+                materia: "Tecnología",
+                curso: "1º ( 1C )",
+                rowClass: ""
+            },
+            // ...añade el resto de tus libros aquí...
+        ];
     }
 
     static get styles() {
@@ -8,24 +26,26 @@ class Tables extends HTMLElement {
         `;
     }
 
-    sendCustomEvent1() {
-        const messageEvent1 = new CustomEvent("tables:nav-aniot-01", {
-                detail: { from: "book-link", message: "Digital Design and Computer Architecture, ARM Edition" },
-                bubbles: true,
-                composed: true
-            });
-        this.dispatchEvent(messageEvent1);
-    }
-
     connectedCallback() {
         this.render();
-        this.nlist = this.querySelectorAll("th > a");
-        //console.log(this.nlist.forEach((item) => console.log(item)));
-        this.nlist[0].addEventListener("click", this.sendCustomEvent1);
+        this.addEventListeners();
     }
 
-    disconnectedCallback() {
-        this.nlist[0].removeEventListener("click", this.sendCustomEvent1);
+    addEventListeners() {
+        // Añade el evento personalizado a cada enlace de libro
+        const links = this.querySelectorAll('.book-link');
+        links.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const title = link.textContent;
+                // Lanza el CustomEvent con el título del libro
+                this.dispatchEvent(new CustomEvent("tables:book-selected", {
+                    detail: { from: "book-link", message: title },
+                    bubbles: true,
+                    composed: true
+                }));
+            });
+        });
     }
 
     render() {
@@ -40,183 +60,16 @@ class Tables extends HTMLElement {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="table-active">
-                        <th scope="row">
-                            <a href="#" class="book-link">Digital Design and Computer Architecture, ARM Edition</a>
-                        </th>
-                        <td>608899 - Arquitectura del nodo IoT</td>
-                        <td>Tecnología</td>
-                        <td>1º ( 1C )</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Computer Architecture- A Quantitative Approach</th>
-                        <td>608899 - Arquitectura del nodo IoT</td>
-                        <td>Tecnología</td>
-                        <td>1º ( 1C )</td>
-                    </tr>
-                    <tr class="table-primary">
-                        <th scope="row">IoT Fundamentals</th>
-                        <td>608900 - Redes, protocolos e interfaces I</td>
-                        <td>Tecnología</td>
-                        <td>1º ( 1C )</td>
-                    </tr>
-                    <tr class="table-secondary">
-                        <th scope="row">6LoWPAN demystified</th>
-                        <td>608900 - Redes, protocolos e interfaces I</td>
-                        <td>Tecnología</td>
-                        <td>1º ( 1C )</td>
-                    </tr>
-                    <tr class="table-success">
-                        <th scope="row">6LoWPAN: The Wireless Embedded Internet</th>
-                        <td>608900 - Redes, protocolos e interfaces I</td>
-                        <td>Tecnología</td>
-                        <td>1º ( 1C )</td>
-                    </tr>
-                    <tr class="table-danger">
-                        <th scope="row">Interconnecting Smart Objects with IP</th>
-                        <td>608901 - Redes, protocolos e interfaces II</td>
-                        <td>Tecnología</td>
-                        <td>1º ( 1C )</td>
-                    </tr>
-                    <tr class="table-warning">
-                        <th scope="row">Learning Internet of Things - explore and learn about -- Waher, Peter</th>
-                        <td>608901 - Redes, protocolos e interfaces II</td>
-                        <td>Tecnología</td>
-                        <td>1º ( 1C )</td>
-                    </tr>
-                    <tr class="table-info">
-                        <th scope="row">Big Data con Python</th>
-                        <td>608902 - Tratamiento de datos masivos</td>
-                        <td>Big Data Management</td>
-                        <td>1º ( 1C )</td>
-                    </tr>
-                    <tr class="table-light">
-                        <th scope="row">The internet of things and data analytics handbook</th>
-                        <td>608902 - Tratamiento de datos masivos</td>
-                        <td>Big Data Management</td>
-                        <td>1º ( 1C )</td>
-                    </tr>
-                   <tr class="table-active">
-                        <th scope="row">Las bases de big data y de la inteligencia artificial</th>
-                        <td>608902 - Tratamiento de datos masivos</td>
-                        <td>Big Data Management</td>
-                        <td>1º ( 1C )</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Seven Databases in Seven Weeks - A Guide to Modern Databases</th>
-                        <td>608902 - Tratamiento de datos masivos</td>
-                        <td>Big Data Management</td>
-                        <td>1º ( 1C )</td>
-                    </tr>
-                    <tr class="table-primary">
-                        <th scope="row">Tom White, “Hadoop The Definitive Guide”, 4th Edition</th>
-                        <td>608902 - Tratamiento de datos masivos</td>
-                        <td>Big Data Management</td>
-                        <td>1º ( 1C )</td>
-                    </tr>
-                    <tr class="table-success">
-                        <th scope="row">Enterprise Application Integration - A Wiley Tech Brief </th>
-                        <td>608903 - Diseño de infraestructura inteligente IoT</td>
-                        <td>Big Data Management</td>
-                        <td>1º ( 1C )</td>
-                    </tr>
-                    <tr class="table-danger">
-                        <th scope="row">Blockchains_and_Smart_Contracts_for_the_Internet_of_Things</th>
-                        <td>608903 - Diseño de infraestructura inteligente IoT</td>
-                        <td>Big Data Management</td>
-                        <td>1º ( 1C )</td>
-                    </tr>
-                    <tr class="table-warning">
-                        <th scope="row">Learning Spring Boot 3.0- Simplify the development of </th>
-                        <td>608903 - Diseño de infraestructura inteligente IoT</td>
-                        <td>Big Data Management</td>
-                        <td>1º ( 1C )</td>
-                    </tr>
-                    <tr class="table-secondary">
-                        <th scope="row">Cloud Native Java - Designing Resilient Systems with Spring</th>
-                        <td>608903 - Diseño de infraestructura inteligente IoT</td>
-                        <td>Big Data Management</td>
-                        <td>1º ( 1C )</td>
-                    </tr>
-                    <tr class="table-info">
-                        <th scope="row">The IoT Hackers Handbook - A Practical Guide to Hacking the</th>
-                        <td>608904 - Seguridad y Legalidad</td>
-                        <td>Seguridad</td>
-                        <td>1º ( 2C )</td>
-                    </tr>
-                    <tr class="table-light">
-                        <th scope="row">IoT penetration testing cookbook - identify vulnerabilities</th>
-                        <td>608904 - Seguridad y Legalidad</td>
-                        <td>Seguridad</td>
-                        <td>1º ( 2C )</td>
-                    </tr>
-                   <tr class="table-active">
-                        <th scope="row">Practical Internet of Things Security - Design a Security</th>
-                        <td>608904 - Seguridad y Legalidad</td>
-                        <td>Seguridad</td>
-                        <td>1º ( 2C )</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Hands-On Cryptography with Python - Leverage the Power of </th>
-                        <td>608904 - Seguridad y Legalidad</td>
-                        <td>Seguridad</td>
-                        <td>1º ( 2C )</td>
-                    </tr>
-                    <tr class="table-primary">
-                        <th scope="row">Designing Secure Software - A Guide for Developers </th>
-                        <td>608904 - Seguridad y Legalidad</td>
-                        <td>Seguridad</td>
-                        <td>1º ( 2C )</td>
-                    </tr>
-                    <tr class="table-secondary">
-                        <th scope="row">Web Application Security - Exploitation and Countermeasures</th>
-                        <td>608904 - Seguridad y Legalidad</td>
-                        <td>Seguridad</td>
-                        <td>1º ( 2C )</td>
-                    </tr>
-                    <tr class="table-success">
-                        <th scope="row">EU General Data Protection Regulation (GDPR) An</th>
-                        <td>608904 - Seguridad y Legalidad</td>
-                        <td>Seguridad</td>
-                        <td>1º ( 2C )</td>
-                    </tr>
-                    <tr class="table-danger">
-                        <th scope="row">Deep Learning (Adaptive Computation and Machine Learning</th>
-                        <td>608905 - Inteligencia Artificial aplicada a IoT</td>
-                        <td>Big Data Management</td>
-                        <td>1º ( 2C )</td>
-                    </tr>
-                    <tr class="table-warning">
-                        <th scope="row">Deep Learning with Python, Second Edition (MEAP V04)</th>
-                        <td>608905 - Inteligencia Artificial aplicada a IoT</td>
-                        <td>Big Data Management</td>
-                        <td>1º ( 2C )</td>
-                    </tr>
-                    <tr class="table-info">
-                        <th scope="row">Hands-On Machine Learning with Scikit-Learn and TensorFlow</th>
-                        <td>608905 - Inteligencia Artificial aplicada a IoT</td>
-                        <td>Big Data Management</td>
-                        <td>1º ( 2C )</td>
-                    </tr>
-                    <tr class="table-light">
-                        <th scope="row">The Elements of Statistical Learning, 2nd Ed. -- Trevor Hastie</th>
-                        <td>608905 - Inteligencia Artificial aplicada a IoT</td>
-                        <td>Big Data Management</td>
-                        <td>1º ( 2C )</td>
-                    </tr>
-                   <tr class="table-active">
-                        <th scope="row">Machine Learning -- Tom Michael Mitchell</th>
-                        <td>608905 - Inteligencia Artificial aplicada a IoT</td>
-                        <td>Big Data Management</td>
-                        <td>1º ( 2C )</td>
-                    </tr>
-                    <tr class="table-dark">
-                        <th scope="row">Dark</th>
-                        <td>Column content</td>
-                        <td>Column content</td>
-                        <td>Column content</td>
-                    </tr>
-
+                     ${this.books.map(book => `
+                        <tr class="${book.rowClass}">
+                            <th scope="row">
+                                <a href="#" class="book-link">${book.title}</a>
+                            </th>
+                            <td>${book.asignatura}</td>
+                            <td>${book.materia}</td>
+                            <td>${book.curso}</td>
+                        </tr>
+                    `).join('')}
                 </tbody>
             </table>
         `;
