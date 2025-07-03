@@ -8,7 +8,8 @@ class Jumbotron extends HTMLElement {
     handleEvent(event) {
         if( event.type === "user:nav-ejercicios" || 
             event.type === "user:nav-cuestonarios" ||
-            event.type === "user:nav-cpersonalizado") {
+            event.type === "user:nav-cpersonalizado" ||
+            event.type === "tables:nav-aniot-01") {
             this.data = event.detail;
             this.render();
         }
@@ -33,6 +34,7 @@ class Jumbotron extends HTMLElement {
         document.addEventListener("user:nav-ejercicios", this);
         document.addEventListener("user:nav-cuestonarios", this);
         document.addEventListener("user:nav-cpersonalizado", this);
+        document.addEventListener("tables:nav-aniot-01", this);
         this.render();
     }
 
@@ -40,6 +42,7 @@ class Jumbotron extends HTMLElement {
         document.removeEventListener("user:nav-ejercicios", this);
         document.removeEventListener("user:nav-cuestonarios", this);
         document.removeEventListener("user:nav-cpersonalizado", this);
+        document.removeEventListener("tables:nav-aniot-01", this);
     }
 
     noRange() {
@@ -73,14 +76,11 @@ class Jumbotron extends HTMLElement {
     render() {
         this.innerHTML = (this.data.from === "Ejercicios")? this.hasRange() : this.noRange();
         if (this.data.from === "Ejercicios") {
-            console.log("está!");
 
             this.output = document.querySelector("output");
             const range = document.querySelector("#pi_input");
 
             range.addEventListener("input", this);
-        } else {
-            console.log("No está!");
         }
     }
 

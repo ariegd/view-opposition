@@ -2,11 +2,12 @@ class Cards extends HTMLElement {
     constructor() {
         super();
         this.data = {};
-        this.data.message = '25'; // Default value for the limit
+        this.data.message = '25'; // Default value for the limit*/
     }
 
     handleEvent(event) {
-        if (event.type === "user:jumbo-input") {
+        if (event.type === "user:nav-ejercicios" || 
+            event.type === "user:jumbo-input") {
             this.data = event.detail; // Update data from the event
             this.render(); // Re-render the component
             this.addEventListeners(); // Re-attach event listeners
@@ -19,12 +20,15 @@ class Cards extends HTMLElement {
     }
 
     connectedCallback() {
+        document.addEventListener("user:nav-ejercicios", this);
         document.addEventListener("user:jumbo-input", this); // Listen for updates from Jumbo.js
+        this.data.from = this.getAttribute('title')
         this.render();
         this.addEventListeners();
     }
 
     disconnectedCallback() {
+        document.removeEventListener("user:nav-ejercicios", this);
         document.removeEventListener("user:jumbo-input", this);
     }
 
@@ -57,9 +61,9 @@ class Cards extends HTMLElement {
         quiz.setAttribute('endpoint', endpoint); // Pass the endpoint to the Quiz component
         document.body.appendChild(quiz);
     }
-
-    render() {
-        this.innerHTML = /*html*/ `
+    
+    hasOppositions(){
+        return /* html */ `
         <div class="row">
             <div class="col-md-4">
                 <div class="card text-white bg-primary mb-3" style="max-width: 20rem;">
@@ -220,6 +224,47 @@ class Cards extends HTMLElement {
             </div>
         </div>
         `;
+    }
+
+    hasBooks(){
+        return /* html */ `
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card text-white bg-primary mb-3" style="max-width: 20rem;">
+                    <div class="card-header">Header</div>
+                    <div class="card-body">
+                        <h4 class="card-title">Chapter 1</h4>
+                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
+                        <button type="button" class="btn btn-success" data-programa="ag">Start Quiz</button>
+                    </div>
+                </div>
+                <div class="card text-white bg-secondary mb-3" style="max-width: 20rem;">
+                    <div class="card-header">Header</div>
+                    <div class="card-body">
+                        <h4 class="card-title">Chapter 2</h4>
+                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
+                        <button type="button" class="btn btn-success" data-programa="sc">Start Quiz</button>
+                    </div>
+                </div>
+                <div class="card bg-light mb-3" style="max-width: 20rem;">
+                    <div class="card-header">Header</div>
+                    <div class="card-body">
+                        <h4 class="card-title">Chapter 3</h4>
+                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
+                        <button type="button" class="btn btn-success" data-materia="ED">Start Quiz</button>
+                    </div>
+                </div>
+            </div>
+           
+        </div>
+        `;
+    }
+
+    render() {
+        console.log('this.data.message: ', this.data.message);
+        console.log('this.data.from: ', this.data.from);
+        this.innerHTML = (this.data.from === "Ejercicios")?this.hasOppositions():this.hasBooks();
+
     }
 }
 

@@ -43,7 +43,7 @@ class Root extends HTMLElement {
         
         if (this.data.from === "Ejercicios") {
             result = /* html */`<div class="container mt-3">
-                <tag-card/>    
+                <tag-card title="${this.data.from}"/>    
             </div>`;           
         }
         else if (this.data.from === "Cuestonarios") {
@@ -58,7 +58,7 @@ class Root extends HTMLElement {
         }
         else if (this.data.from === "book-link") {
             result = /* html */`<div class="container mt-3">
-                <tag-card/>
+                <tag-card title="${this.data.from}"/>
             </div>`; 
         }
 

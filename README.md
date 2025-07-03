@@ -1,6 +1,23 @@
 # view-opposition
 Vista del proyecto relacionado con los test de oposición. Utilizando bootswatch (basic) y web componentes. 
 
+## Pasando un valor del componente Root.js a Cards.js
+
+Para pasar el valor `"book-link"` (o cualquier otro dato, como el título del libro) al componente `<tag-card/>`, simplemente añade un atributo personalizado en el HTML generado y usa el valor de `this.data`:
+
+```javascript
+else if (this.data.from === "book-link") {
+    result = /* html */`<div class="container mt-3">
+        <tag-card title="${this.data.message}"/>
+    </div>`; 
+}
+```
+
+Así, en tu componente `tag-card`, puedes acceder al atributo `title` usando `this.getAttribute('title')` en el constructor o en `connectedCallback`.
+
+**Resumen:**  
+- Usa `<tag-card title="${this.data.message}"/>` para pasar el valor.
+- En el componente, accede con `this.getAttribute('title')`.
 
 ### [Tables.js](file:///home/zodd/Documentos/%40Documentos/Master2024/curso%202024/2595_MEAN_ALUMNOS/MEAN/05_MEAN/04_Oposicion/view-opposition/src/components/Tables.js)
 
