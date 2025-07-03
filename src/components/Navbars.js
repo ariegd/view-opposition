@@ -48,6 +48,12 @@ class Navbars extends HTMLElement {
         this.ass[2].addEventListener("click", this.sendCustomEvent3);
     }
 
+    disconnectedCallback() {
+        this.ass[0].removeEventListener("click", this.sendCustomEvent1);
+        this.ass[1].removeEventListener("click", this.sendCustomEvent2);
+        this.ass[2].removeEventListener("click", this.sendCustomEvent3);
+    }
+
     render() {
         this.innerHTML = /*html*/ `
   
@@ -94,11 +100,6 @@ class Navbars extends HTMLElement {
         `;
     }
 
-    disconnectedCallback() {
-        this.ass[0].removeEventListener("click", this.sendCustomEvent1);
-        this.ass[1].removeEventListener("click", this.sendCustomEvent2);
-        this.ass[2].removeEventListener("click", this.sendCustomEvent3);
-    }
 
 }
 

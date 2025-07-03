@@ -7,7 +7,8 @@ class Root extends HTMLElement {
     handleEvent(event) {
         if( event.type === "user:nav-ejercicios" || 
             event.type === "user:nav-cuestonarios" ||
-            event.type === "user:nav-cpersonalizado" ){
+            event.type === "user:nav-cpersonalizado" ||
+            event.type === "tables:nav-aniot-01"){
             this.data = event.detail;
             this.render();
         }
@@ -22,13 +23,15 @@ class Root extends HTMLElement {
         document.addEventListener("user:nav-ejercicios", this);
         document.addEventListener("user:nav-cuestonarios", this);
         document.addEventListener("user:nav-cpersonalizado", this);
+        document.addEventListener("tables:nav-aniot-01", this);
         this.render();
     }
 
     disconnectedCallback() {
         document.removeEventListener("user:nav-ejercicios", this);
         document.removeEventListener("user:nav-cuestonarios", this);
-        document.removeEventListener("user:nav-cpersonalizado", this);    
+        document.removeEventListener("user:nav-cpersonalizado", this);   
+        document.removeEventListener("tables:nav-aniot-01", this);   
     }
 
     noMessages() {
@@ -51,6 +54,11 @@ class Root extends HTMLElement {
         else if (this.data.from === "Cuestonarios-P") {
             result = /* html */`<div class="container mt-3">
                 <tag-button/>
+            </div>`; 
+        }
+        else if (this.data.from === "book-link") {
+            result = /* html */`<div class="container mt-3">
+                <tag-card/>
             </div>`; 
         }
 

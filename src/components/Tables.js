@@ -5,38 +5,27 @@ class Tables extends HTMLElement {
 
     static get styles() {
         return /*css*/ `  
-        tag-table {
-          display: block;
-          min-height: 100vh;
-        }
         `;
     }
 
-    addEventListeners() {
-        // Selecciona todos los enlaces de libros
-        const links = this.querySelectorAll('.book-link');
-        links.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                // Quita la tabla
-                this.innerHTML = '';
-                const container = document.createElement('div');
-                container.className = 'd-flex justify-content-center align-items-center';
-                container.style.minHeight = '60vh'; // Opcional: altura mínima para centrar verticalmente
-
-                // Monta el componente de detalle (por ejemplo, tag-card)
-                const detail = document.createElement('tag-card');
-                detail.setAttribute('title', link.textContent);
-
-                container.appendChild(detail);
-                this.appendChild(container); // <-- Añade el contenedor al propio componente
+    sendCustomEvent1() {
+        const messageEvent1 = new CustomEvent("tables:nav-aniot-01", {
+                detail: { from: "book-link", message: "Digital Design and Computer Architecture, ARM Edition" },
+                bubbles: true,
+                composed: true
             });
-        });
+        this.dispatchEvent(messageEvent1);
     }
 
     connectedCallback() {
         this.render();
-        this.addEventListeners();
+        this.nlist = this.querySelectorAll("th > a");
+        //console.log(this.nlist.forEach((item) => console.log(item)));
+        this.nlist[0].addEventListener("click", this.sendCustomEvent1);
+    }
+
+    disconnectedCallback() {
+        this.nlist[0].removeEventListener("click", this.sendCustomEvent1);
     }
 
     render() {
@@ -231,10 +220,6 @@ class Tables extends HTMLElement {
                 </tbody>
             </table>
         `;
-    }
-
-    disconnectedCallback() {
-        this.ass[1].removeEventListener("click", this.sendCustomEvent1);
     }
 
 }
