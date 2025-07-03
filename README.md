@@ -1,6 +1,104 @@
 # view-opposition
 Vista del proyecto relacionado con los test de oposición. Utilizando bootswatch (basic) y web componentes. 
 
+## <div class="card text-white bg-${card.color} colocar un condicionar si card.color = light no colocar el text-white
+
+Para que la clase `text-white` **solo se aplique si** `card.color` **NO es** `"light"`, puedes usar un condicional en el template string:
+
+```javascript
+<div class="card${card.color === 'light' ? '' : ' text-white'} bg-${card.color} mb-3" style="max-width: 20rem;">
+```
+
+Así, si el color es `light`, **no** se añade `text-white`; para cualquier otro color, sí.
+
+**Ejemplo en tu bucle:**
+```javascript
+<div class="card${card.color === 'light' ? '' : ' text-white'} bg-${card.color} mb-3" style="max-width: 20rem;">
+    <div class="card-header">Header</div>
+    <div class="card-body">
+        <h4 class="card-title">${card.title}</h4>
+        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
+        <button type="button" class="btn btn-success" data-${card.type}="${card.value}">Start Quiz</button>
+    </div>
+</div>
+```
+
+Esto hará que las tarjetas con fondo claro tengan texto oscuro y las demás, texto blanco.
+
+## bucle que me genere dinamicamente los elementos de hasOppositions() en Cards.js
+
+Aquí tienes cómo transformar el contenido de `hasOppositions()` en un **bucle dinámico** usando un array de objetos para las tarjetas. Así puedes añadir, quitar o modificar oposiciones fácilmente:
+
+```javascript
+class Cards extends HTMLElement {
+    constructor() {
+        super();
+        this.data = {};
+        this.data.message = '25';
+
+        // Array de oposiciones
+        this.oppositions = [
+            { title: "Organización del Estado", color: "primary", type: "programa", value: "ag" },
+            { title: "Sistemas y Comunicaciones", color: "secondary", type: "programa", value: "sc" },
+            { title: "Estructura de Datos", color: "light", type: "materia", value: "ED" },
+            { title: "Tecnología básica", color: "danger", type: "programa", value: "tb" },
+            { title: "CSS", color: "warning", type: "materia", value: "CSS" },
+            { title: "JavaScript", color: "info", type: "materia", value: "JS" },
+            { title: "Desarrollo de sistemas", color: "light", type: "programa", value: "ds" },
+            { title: "Díagramas", color: "dark", type: "materia", value: "UML" },
+            { title: "NET", color: "danger", type: "materia", value: "NET" },
+            { title: "HTML", color: "danger", type: "materia", value: "HTML" },
+            { title: "Patrones Diseño", color: "warning", type: "materia", value: "GoF" },
+            { title: "Cálculo", color: "info", type: "materia", value: "Cálculo" },
+            { title: "SQL", color: "light", type: "materia", value: "SQL" },
+            { title: "Java", color: "dark", type: "materia", value: "JAVA" },
+            { title: "Algoritmos de Ordenación", color: "danger", type: "materia", value: "Algoritmos de Ordenación" },
+            { title: "PHP", color: "primary", type: "materia", value: "PHP" },
+            { title: "Red", color: "secondary", type: "materia", value: "RED" },
+            { title: "Hardware", color: "light", type: "materia", value: "HARDWARE" }
+        ];
+    }
+
+    // ...resto del código...
+
+    hasOppositions() {
+        // Agrupa las tarjetas en columnas de 3
+        const columns = [[], [], [], [], [], []];
+        this.oppositions.forEach((item, idx) => {
+            columns[idx % 6].push(item);
+        });
+
+        return /* html */ `
+        <div class="row">
+            ${columns.map(col => `
+                <div class="col-md-4">
+                    ${col.map(card => `
+                        <div class="card text-white bg-${card.color} mb-3" style="max-width: 20rem;">
+                            <div class="card-header">Header</div>
+                            <div class="card-body">
+                                <h4 class="card-title">${card.title}</h4>
+                                <p class="card-text"><output>${this.data.message}</output> preguntas</p>
+                                <button type="button" class="btn btn-success" data-${card.type}="${card.value}">Start Quiz</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('')}
+        </div>
+        `;
+    }
+
+    // ...resto del código...
+}
+```
+
+**Ventajas:**
+- Puedes modificar fácilmente las oposiciones en el array.
+- El bucle genera dinámicamente todas las tarjetas y columnas.
+- El botón se adapta automáticamente a `data-materia` o `data-programa` según corresponda.
+
+Puedes ajustar el número de columnas cambiando el valor `6` en el array `columns` y en el módulo `% 6` según tu diseño.
+
 ## Un bucle que me cree dinamicamente todos los elementos del <tbody> junto con su CustomenEvent
 
 Claro, aquí tienes un ejemplo de cómo generar dinámicamente todas las filas del `<tbody>` a partir de un array de datos y añadir el evento personalizado a cada enlace de libro:

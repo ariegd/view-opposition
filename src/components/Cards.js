@@ -3,6 +3,28 @@ class Cards extends HTMLElement {
         super();
         this.data = {};
         this.data.message = '25'; // Default value for the limit*/
+        
+        // Array de oposiciones
+        this.oppositions = [
+            { title: "Organización del Estado", color: "primary", type: "programa", value: "ag" },
+            { title: "Sistemas y Comunicaciones", color: "secondary", type: "programa", value: "sc" },
+            { title: "Estructura de Datos", color: "light", type: "materia", value: "ED" },
+            { title: "Tecnología básica", color: "danger", type: "programa", value: "tb" },
+            { title: "CSS", color: "warning", type: "materia", value: "CSS" },
+            { title: "JavaScript", color: "info", type: "materia", value: "JS" },
+            { title: "Desarrollo de sistemas", color: "light", type: "programa", value: "ds" },
+            { title: "Díagramas", color: "dark", type: "materia", value: "UML" },
+            { title: "NET", color: "danger", type: "materia", value: "NET" },
+            { title: "HTML", color: "danger", type: "materia", value: "HTML" },
+            { title: "Patrones Diseño", color: "warning", type: "materia", value: "GoF" },
+            { title: "Cálculo", color: "info", type: "materia", value: "Cálculo" },
+            { title: "SQL", color: "light", type: "materia", value: "SQL" },
+            { title: "Java", color: "dark", type: "materia", value: "JAVA" },
+            { title: "Algoritmos de Ordenación", color: "danger", type: "materia", value: "Algoritmos de Ordenación" },
+            { title: "PHP", color: "primary", type: "materia", value: "PHP" },
+            { title: "Red", color: "secondary", type: "materia", value: "RED" },
+            { title: "Hardware", color: "light", type: "materia", value: "HARDWARE" }
+        ];
     }
 
     handleEvent(event) {
@@ -62,169 +84,33 @@ class Cards extends HTMLElement {
         document.body.appendChild(quiz);
     }
     
-    hasOppositions(){
+     hasOppositions() {
+        // Agrupa las tarjetas en columnas de 3
+        const columns = [[], [], [], [], [], []];
+        this.oppositions.forEach((item, idx) => {
+            columns[idx % 6].push(item);
+        });
+
         return /* html */ `
         <div class="row">
-            <div class="col-md-4">
-                <div class="card text-white bg-primary mb-3" style="max-width: 20rem;">
-                    <div class="card-header">Header</div>
-                    <div class="card-body">
-                        <h4 class="card-title">Organización del Estado</h4>
-                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                        <button type="button" class="btn btn-success" data-programa="ag">Start Quiz</button>
-                    </div>
+            ${columns.map(col => `
+                <div class="col-md-4">
+                    ${col.map(card => `
+                        <div class="card${card.color === 'light' ? '' : ' text-white'} bg-${card.color} mb-3" style="max-width: 20rem;">
+                            <div class="card-header">Header</div>
+                            <div class="card-body">
+                                <h4 class="card-title">${card.title}</h4>
+                                <p class="card-text"><output>${this.data.message}</output> preguntas</p>
+                                <button type="button" class="btn btn-success" data-${card.type}="${card.value}">Start Quiz</button>
+                            </div>
+                        </div>
+                    `).join('')}
                 </div>
-                <div class="card text-white bg-secondary mb-3" style="max-width: 20rem;">
-                    <div class="card-header">Header</div>
-                    <div class="card-body">
-                        <h4 class="card-title">Sistemas y Comunicaciones</h4>
-                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                        <button type="button" class="btn btn-success" data-programa="sc">Start Quiz</button>
-                    </div>
-                </div>
-                <div class="card bg-light mb-3" style="max-width: 20rem;">
-                    <div class="card-header">Header</div>
-                    <div class="card-body">
-                        <h4 class="card-title">Estructura de Datos</h4>
-                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                        <button type="button" class="btn btn-success" data-materia="ED">Start Quiz</button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card text-white bg-danger mb-3" style="max-width: 20rem;">
-                    <div class="card-header">Header</div>
-                    <div class="card-body">
-                        <h4 class="card-title">Tecnología básica</h4>
-                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                        <button type="button" class="btn btn-success" data-programa="tb">Start Quiz</button>
-                    </div>
-                </div>
-                <div class="card text-white bg-warning mb-3" style="max-width: 20rem;">
-                    <div class="card-header">Header</div>
-                    <div class="card-body">
-                        <h4 class="card-title">CSS</h4>
-                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                        <button type="button" class="btn btn-success" data-materia="CSS">Start Quiz</button>
-                    </div>
-                </div>
-                <div class="card text-white bg-info mb-3" style="max-width: 20rem;">
-                    <div class="card-header">Header</div>
-                    <div class="card-body">
-                        <h4 class="card-title">JavaScript</h4>
-                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                        <button type="button" class="btn btn-success" data-materia="JS">Start Quiz</button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card bg-light mb-3" style="max-width: 20rem;">
-                    <div class="card-header">Header</div>
-                    <div class="card-body">
-                        <h4 class="card-title">Desarrollo de sistemas</h4>
-                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                        <button type="button" class="btn btn-success" data-programa="ds">Start Quiz</button>
-                    </div>
-                </div>
-                <div class="card text-white bg-dark mb-3" style="max-width: 20rem;">
-                    <div class="card-header">Header</div>
-                    <div class="card-body">
-                        <h4 class="card-title">Díagramas</h4>
-                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                        <button type="button" class="btn btn-success" data-materia="UML">Start Quiz</button>
-                    </div>
-                </div>
-                <div class="card text-white bg-danger mb-3" style="max-width: 20rem;">
-                    <div class="card-header">Header</div>
-                    <div class="card-body">
-                        <h4 class="card-title">NET</h4>
-                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                        <button type="button" class="btn btn-success" data-materia="NET">Start Quiz</button>
-                    </div>
-                </div>       
-            </div>
-
-            <div class="col-md-4">
-                <div class="card text-white bg-danger mb-3" style="max-width: 20rem;">
-                    <div class="card-header">Header</div>
-                    <div class="card-body">
-                        <h4 class="card-title">HTML</h4>
-                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                        <button type="button" class="btn btn-success" data-materia="HTML">Start Quiz</button>
-                    </div>
-                </div>
-                <div class="card text-white bg-warning mb-3" style="max-width: 20rem;">
-                    <div class="card-header">Header</div>
-                    <div class="card-body">
-                        <h4 class="card-title">Patrones Diseño</h4>
-                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                        <button type="button" class="btn btn-success" data-materia="GoF">Start Quiz</button>
-                    </div>
-                </div>
-                <div class="card text-white bg-info mb-3" style="max-width: 20rem;">
-                    <div class="card-header">Header</div>
-                    <div class="card-body">
-                        <h4 class="card-title">Cálculo</h4>
-                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                        <button type="button" class="btn btn-success" data-materia="Cálculo">Start Quiz</button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card bg-light mb-3" style="max-width: 20rem;">
-                    <div class="card-header">Header</div>
-                    <div class="card-body">
-                        <h4 class="card-title">SQL</h4>
-                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                        <button type="button" class="btn btn-success" data-materia="SQL">Start Quiz</button>
-                    </div>
-                </div>
-                <div class="card text-white bg-dark mb-3" style="max-width: 20rem;">
-                    <div class="card-header">Header</div>
-                    <div class="card-body">
-                        <h4 class="card-title">Java</h4>
-                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                        <button type="button" class="btn btn-success" data-materia="JAVA">Start Quiz</button>
-                    </div>
-                </div>
-                <div class="card text-white bg-danger mb-3" style="max-width: 20rem;">
-                    <div class="card-header">Header</div>
-                    <div class="card-body">
-                        <h4 class="card-title">Algoritmos de Ordenación</h4>
-                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                        <button type="button" class="btn btn-success" data-materia="Algoritmos de Ordenación">Start Quiz</button>
-                    </div>
-                </div>       
-            </div>
-            <div class="col-md-4">
-                <div class="card text-white bg-primary mb-3" style="max-width: 20rem;">
-                    <div class="card-header">Header</div>
-                    <div class="card-body">
-                        <h4 class="card-title">PHP</h4>
-                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                    <button type="button" class="btn btn-success" data-materia="PHP">Start Quiz</button>
-                    </div>
-                </div>
-                <div class="card text-white bg-secondary mb-3" style="max-width: 20rem;">
-                    <div class="card-header">Header</div>
-                    <div class="card-body">
-                        <h4 class="card-title">Red</h4>
-                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                        <button type="button" class="btn btn-success" data-materia="RED">Start Quiz</button>
-                    </div>
-                </div>
-                <div class="card bg-light mb-3" style="max-width: 20rem;">
-                    <div class="card-header">Header</div>
-                    <div class="card-body">
-                        <h4 class="card-title">Hardware</h4>
-                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                        <button type="button" class="btn btn-success" data-materia="HARDWARE">Start Quiz</button>
-                    </div>
-                </div>
-            </div>
+            `).join('')}
         </div>
         `;
     }
+
 
     hasBooks(){
         return /* html */ `
@@ -261,7 +147,9 @@ class Cards extends HTMLElement {
     }
 
     render() {
-        this.innerHTML = (this.data.from === "Ejercicios")?this.hasOppositions():this.hasBooks();
+        console.log('rendering Cards component with data:', this.data.from);
+        console.log('rendering Cards component with message:', this.data.message);
+        this.innerHTML = (this.data.from === "book-link")?this.hasBooks():this.hasOppositions();
 
     }
 }
