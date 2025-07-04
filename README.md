@@ -1,20 +1,21 @@
 # view-opposition
 Vista del proyecto relacionado con los test de oposición. Utilizando bootswatch (basic) y web componentes. 
 
-   - [Aleatorio no, seguir la secuencia del array y si se acaba comenzar por el valor inicial del array rowClasses](#aleatorio-no,-seguir-la-secuencia-del-array-rowClasses)
-   - [No se muestra nada](#no-se-muestra-nada)
-   - [Reemplazar el this.books con acceso a MongoDB Cloud](#reemplazar-el-this.books-con-acceso-a-MongoDB-Cloud)
-    - [Colocar un condicionar si card.color = light no colocar el text-white](#colocar-un-condicionar-si-card.color=light-no-colocar-el-text-white)
-   - [Bucle que me genere dinamicamente los elementos de hasOppositions() en Cards.js](#bucle-que-me-genere-dinamicamente-los-elementos-de-hasoppositions()-en-cards.js)
-   - [Un bucle que me cree dinamicamente todos los elementos del <tbody> junto con su CustomenEvent](#un-bucle-que-me-cree-dinamicamente-todos-los-elementos-del-<tbody>-junto-con-su-customenevent)
-   - [Pasando un valor del componente Root.js a Cards.js](#pasando-un-valor-del-componente-root.js-a-cards.js)
-   - [Cómo crear hiperlink a otro componente desde el componente tables?](#cómo-crear-hiperlink-a-otro-componente-desde-el componente-tables?)
-   - [To make the Cards.js call the Quiz.js](#to-make-the-cards.js-call-the-quiz.js)
-    - [Fetch question from data-materia and data-programa](#fetch-question-from-data-materia-and-data-programa)
-   - [To change value limit=5 by this.data.message](#to-change-value-limit=5-by-this.data.message)
-   - [Solution why when I change input type="range" not event click in button from Cards.js](#solution-why-when-i-change-input-type="range"-not-event-click-in-button-from-cards.js)
+   - [Aleatorio no, seguir la secuencia del array y si se acaba comenzar por el valor inicial del array rowClasses](#pregunta-12)
+   - [No se muestra nada](#pregunta-11)
+   - [Reemplazar el this.books con acceso a MongoDB Cloud](#pregunta-10)
+   - [Colocar un condicionar si card.color = light no colocar el text-white](#pregunta-9)
+   - [Bucle que me genere dinamicamente los elementos de hasOppositions() en Cards.js](#pregunta-8)
+   - [Un bucle que me cree dinamicamente todos los elementos del <tbody> junto con su CustomenEvent](#pregunta-7)
+   - [Pasando un valor del componente Root.js a Cards.js](#pregunta-6)
+   - [Cómo crear hiperlink a otro componente desde el componente tables?](#pregunta-5)
+   - [To make the Cards.js call the Quiz.js](#pregunta-4)
+   - [Fetch question from data-materia and data-programa](#pregunta-3)
+   - [To change value limit=5 by this.data.message](#pregunta-2)
+   - [Solution why when I change input type="range" not event click in button from Cards.js](#pregunta-1)
 
-## aleatorio no, seguir la secuencia del array rowClasses
+##Pregunta 12 
+**aleatorio no, seguir la secuencia del array rowClasses**
 
 Para asignar las clases de rowClasses siguiendo el orden y, si se acaban, volver a empezar desde el principio (circular), simplemente usa el índice del libro y el operador módulo (%) sobre la longitud del array de clases.
 
@@ -22,7 +23,9 @@ Modifica tu método render() así:
 
 Así, la asignación de clases será secuencial y cíclica, nunca aleatoria.
 
-## No se muestra nada
+## Pregunta 11
+**No se muestra nada**
+
 El problema es que en tu método `connectedCallback()` primero llamas a `this.render()` y `this.addEventListeners()`, y **después** haces `await this.fetchBooks()`.  
 Esto provoca que la tabla se renderice con el array vacío (o con los datos estáticos si no has borrado el array), y cuando llegan los datos de la API, **no vuelves a renderizar** la tabla.
 
@@ -60,7 +63,9 @@ Si quieres mostrar un "Cargando..." mientras esperas los datos, puedes poner `th
 
 Así se mostrará correctamente la tabla con los datos de MongoDB Cloud.
 
-## reemplazar el this.books con acceso a MongoDB Cloud
+## Pregunta 10
+**reemplazar el this.books con acceso a MongoDB Cloud**
+
 Para reemplazar `this.books` con acceso dinámico a los datos desde MongoDB Cloud, necesitas:
 
 1. Crear un endpoint REST en tu backend (Node.js/Express) que devuelva los libros desde MongoDB.
@@ -188,7 +193,8 @@ customElements.define("tag-table", Tables);
 - Renderiza la tabla con los datos recibidos dinámicamente.
 
 
-## Colocar un condicionar si card.color=light no colocar el text-white
+## Pregunta 9
+**Colocar un condicionar si card.color=light no colocar el text-white**
 
 Para que la clase `text-white` **solo se aplique si** `card.color` **NO es** `"light"`, puedes usar un condicional en el template string:
 
@@ -212,7 +218,8 @@ Así, si el color es `light`, **no** se añade `text-white`; para cualquier otro
 
 Esto hará que las tarjetas con fondo claro tengan texto oscuro y las demás, texto blanco.
 
-## Bucle que me genere dinamicamente los elementos de hasOppositions() en Cards.js
+## Pregunta 8
+**Bucle que me genere dinamicamente los elementos de hasOppositions() en Cards.js**
 
 Aquí tienes cómo transformar el contenido de `hasOppositions()` en un **bucle dinámico** usando un array de objetos para las tarjetas. Así puedes añadir, quitar o modificar oposiciones fácilmente:
 
@@ -286,7 +293,8 @@ class Cards extends HTMLElement {
 
 Puedes ajustar el número de columnas cambiando el valor `6` en el array `columns` y en el módulo `% 6` según tu diseño.
 
-## Un bucle que me cree dinamicamente todos los elementos del <tbody> junto con su CustomenEvent
+## Pregunta 7
+**Un bucle que me cree dinamicamente todos los elementos del <tbody> junto con su CustomenEvent**
 
 Claro, aquí tienes un ejemplo de cómo generar dinámicamente todas las filas del `<tbody>` a partir de un array de datos y añadir el evento personalizado a cada enlace de libro:
 
@@ -374,7 +382,8 @@ customElements.define("tag-table", Tables);
 
 Puedes escuchar el evento `tables:book-selected` en el componente padre o donde lo necesites para mostrar detalles, cambiar el jumbotron, etc.
 
-## Pasando un valor del componente Root.js a Cards.js
+## Pregunta 6
+**Pasando un valor del componente Root.js a Cards.js**
 
 Para pasar el valor `"book-link"` (o cualquier otro dato, como el título del libro) al componente `<tag-card/>`, simplemente añade un atributo personalizado en el HTML generado y usa el valor de `this.data`:
 
@@ -394,7 +403,8 @@ Así, en tu componente `tag-card`, puedes acceder al atributo `title` usando `th
 
 ### [Tables.js](file:///home/zodd/Documentos/%40Documentos/Master2024/curso%202024/2595_MEAN_ALUMNOS/MEAN/05_MEAN/04_Oposicion/view-opposition/src/components/Tables.js)
 
-## Cómo crear hiperlink a otro componente desde el componente tables?
+## Pregunra 5
+**Cómo crear hiperlink a otro componente desde el componente tables?**
 
 Para crear un hiperlink a otro componente desde el componente `Tables`, puedes envolver el contenido de la celda con un `<a>` y, al hacer clic, disparar una función que monte el componente deseado (por ejemplo, usando un evento o manipulando el DOM).
 
@@ -595,7 +605,8 @@ Ensure your backend API (e.g., `/api/questions/materia/sql?limit=5&random=true`)
 
 This will allow the `Quiz` component to dynamically load and display the questions.
 
-## To make the Cards.js call the Quiz.js
+## Pregunta 4
+**To make the Cards.js call the Quiz.js**
 
 To make the `<button type="button" class="btn btn-success">Start Quiz</button>` call the `Quiz.js` component, you can add an event listener to the button. When the button is clicked, it can dynamically load the `Quiz` component and pass the necessary data (e.g., `materia`) to it.
 
@@ -764,7 +775,8 @@ Made changes.
 
 Similar code found with 1 license type
 
-## Fetch question from data-materia and data-programa
+## Pregunta 3
+**Fetch question from data-materia and data-programa**
 To handle both `data-materia` and `data-programa` attributes and dynamically fetch questions from either `/api/questions/materia/${materia}?limit=5&random=true` or `/api/questions/programa/${programa}?limit=5&random=true`, you can modify the `startQuiz` method to determine which attribute is present and construct the appropriate API endpoint.
 
 ### Steps:
@@ -943,7 +955,8 @@ customElements.define("tag-quiz", Quiz);
    - This approach allows the `Cards` component to handle both `data-materia` and `data-programa` seamlessly.
 
 
-## To change value limit=5 by this.data.message
+## Pregunta 2
+**To change value limit=5 by this.data.message**
 To dynamically set the `limit` parameter in the API endpoint using `this.data.message`, you can modify the `startQuiz` method in the `Cards` component. Here's how:
 
 ### Updated /home/zodd/Documentos/@Documentos/Master2024/curso 2024/2595_MEAN_ALUMNOS/MEAN/05_MEAN/04_Oposicion/view-opposition/src/components/Cards.js
@@ -1058,7 +1071,9 @@ customElements.define("tag-card", Cards);
    - This approach allows the `limit` to be adjusted dynamically based on the `this.data.message` value.
 
 
-## Solution why when I change input type="range" not event click in button from Cards.js
+## Pregunta 1
+**Solution why when I change input type="range" not event click in button from Cards.js**
+
 The issue occurs because the `input` event from the `<input type="range">` element in `Jumbo.js` is not directly linked to the `click` event of the buttons in `Cards.js`. The `input` event updates the `this.data.message` value in `Jumbo.js`, but `Cards.js` does not automatically re-render or update its event listeners when `this.data.message` changes.
 
 ### Solution:
