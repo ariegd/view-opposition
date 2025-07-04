@@ -1,7 +1,194 @@
 # view-opposition
 Vista del proyecto relacionado con los test de oposición. Utilizando bootswatch (basic) y web componentes. 
 
-## <div class="card text-white bg-${card.color} colocar un condicionar si card.color = light no colocar el text-white
+   - [Aleatorio no, seguir la secuencia del array y si se acaba comenzar por el valor inicial del array rowClasses](#aleatorio-no,-seguir-la-secuencia-del-array-rowClasses)
+   - [No se muestra nada](#no-se-muestra-nada)
+   - [Reemplazar el this.books con acceso a MongoDB Cloud](#reemplazar-el-this.books-con-acceso-a-MongoDB-Cloud)
+    - [Colocar un condicionar si card.color = light no colocar el text-white](#colocar-un-condicionar-si-card.color=light-no-colocar-el-text-white)
+   - [Bucle que me genere dinamicamente los elementos de hasOppositions() en Cards.js](#bucle-que-me-genere-dinamicamente-los-elementos-de-hasoppositions()-en-cards.js)
+   - [Un bucle que me cree dinamicamente todos los elementos del <tbody> junto con su CustomenEvent](#un-bucle-que-me-cree-dinamicamente-todos-los-elementos-del-<tbody>-junto-con-su-customenevent)
+   - [Pasando un valor del componente Root.js a Cards.js](#pasando-un-valor-del-componente-root.js-a-cards.js)
+   - [Cómo crear hiperlink a otro componente desde el componente tables?](#cómo-crear-hiperlink-a-otro-componente-desde-el componente-tables?)
+   - [To make the Cards.js call the Quiz.js](#to-make-the-cards.js-call-the-quiz.js)
+    - [Fetch question from data-materia and data-programa](#fetch-question-from-data-materia-and-data-programa)
+   - [To change value limit=5 by this.data.message](#to-change-value-limit=5-by-this.data.message)
+   - [Solution why when I change input type="range" not event click in button from Cards.js](#solution-why-when-i-change-input-type="range"-not-event-click-in-button-from-cards.js)
+
+## aleatorio no, seguir la secuencia del array rowClasses
+
+Para asignar las clases de rowClasses siguiendo el orden y, si se acaban, volver a empezar desde el principio (circular), simplemente usa el índice del libro y el operador módulo (%) sobre la longitud del array de clases.
+
+Modifica tu método render() así:
+
+Así, la asignación de clases será secuencial y cíclica, nunca aleatoria.
+
+## No se muestra nada
+El problema es que en tu método `connectedCallback()` primero llamas a `this.render()` y `this.addEventListeners()`, y **después** haces `await this.fetchBooks()`.  
+Esto provoca que la tabla se renderice con el array vacío (o con los datos estáticos si no has borrado el array), y cuando llegan los datos de la API, **no vuelves a renderizar** la tabla.
+
+### Solución
+
+Debes:
+1. Llamar a `await this.fetchBooks()` primero.
+2. Luego llamar a `this.render()` y `this.addEventListeners()`.
+
+Así aseguras que la tabla se renderiza con los datos reales.
+
+---
+
+#### Cambia tu `connectedCallback` así:
+
+```javascript
+async connectedCallback() {
+    await this.fetchBooks();
+    this.render();
+    this.addEventListeners();
+}
+```
+
+---
+
+**Opcional:**  
+Si quieres mostrar un "Cargando..." mientras esperas los datos, puedes poner `this.innerHTML = "Cargando...";` antes del fetch.
+
+---
+
+**Resumen:**  
+- Primero obtén los datos (`await this.fetchBooks()`).
+- Luego renderiza la tabla (`this.render()`).
+- Después añade los listeners (`this.addEventListeners()`).
+
+Así se mostrará correctamente la tabla con los datos de MongoDB Cloud.
+
+## reemplazar el this.books con acceso a MongoDB Cloud
+Para reemplazar `this.books` con acceso dinámico a los datos desde MongoDB Cloud, necesitas:
+
+1. Crear un endpoint REST en tu backend (Node.js/Express) que devuelva los libros desde MongoDB.
+2. Hacer un `fetch` en el método `connectedCallback()` para obtener los datos y renderizarlos.
+
+Aquí tienes cómo hacerlo:
+
+---
+
+### 1. Backend: Endpoint para obtener libros
+
+Supón que tienes un modelo `Book` en tu backend. Agrega una ruta como:
+
+```javascript
+// src/routes/bookRoutes.js
+const express = require('express');
+const router = express.Router();
+const Book = require('../models/bookModel');
+
+router.get('/books', async (req, res) => {
+    try {
+        const books = await Book.find();
+        res.json(books);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+module.exports = router;
+```
+
+Y en tu `app.js`:
+```javascript
+const bookRoutes = require('./src/routes/bookRoutes');
+app.use('/api', bookRoutes);
+```
+
+---
+
+### 2. Frontend: Obtener libros dinámicamente
+
+Modifica tu componente `Tables` así:
+
+```javascript
+class Tables extends HTMLElement {
+    constructor() {
+        super();
+        this.books = [];
+    }
+
+    static get styles() {
+        return /*css*/ `  
+        `;
+    }
+
+    async connectedCallback() {
+        await this.fetchBooks();
+        this.render();
+        this.addEventListeners();
+    }
+
+    async fetchBooks() {
+        try {
+            const res = await fetch('https://TU_BACKEND_URL/api/books');
+            this.books = await res.json();
+        } catch (err) {
+            this.books = [];
+            this.innerHTML = `<div class="alert alert-danger">No se pudieron cargar los libros.</div>`;
+        }
+    }
+
+    addEventListeners() {
+        const links = this.querySelectorAll('.book-link');
+        links.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const title = link.textContent;
+                this.dispatchEvent(new CustomEvent("tables:book-selected", {
+                    detail: { from: "book-link", message: title },
+                    bubbles: true,
+                    composed: true
+                }));
+            });
+        });
+    }
+
+    render() {
+        this.innerHTML = /*html*/ `
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Libro</th>
+                        <th scope="col">Asignatura</th>
+                        <th scope="col">Materia</th>
+                        <th scope="col">Curso</th>
+                    </tr>
+                </thead>
+                <tbody>
+                     ${this.books.map(book => `
+                        <tr class="${book.rowClass || ''}">
+                            <th scope="row">
+                                <a href="#" class="book-link">${book.title}</a>
+                            </th>
+                            <td>${book.asignatura}</td>
+                            <td>${book.materia}</td>
+                            <td>${book.curso}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+    }
+}
+
+customElements.define("tag-table", Tables);
+```
+
+**No olvides reemplazar `https://TU_BACKEND_URL/api/books` por la URL real de tu backend.**
+
+---
+
+**Resumen:**  
+- Elimina el array estático `this.books`.
+- Usa `fetch` para obtener los libros desde tu API conectada a MongoDB Cloud.
+- Renderiza la tabla con los datos recibidos dinámicamente.
+
+
+## Colocar un condicionar si card.color=light no colocar el text-white
 
 Para que la clase `text-white` **solo se aplique si** `card.color` **NO es** `"light"`, puedes usar un condicional en el template string:
 
@@ -25,7 +212,7 @@ Así, si el color es `light`, **no** se añade `text-white`; para cualquier otro
 
 Esto hará que las tarjetas con fondo claro tengan texto oscuro y las demás, texto blanco.
 
-## bucle que me genere dinamicamente los elementos de hasOppositions() en Cards.js
+## Bucle que me genere dinamicamente los elementos de hasOppositions() en Cards.js
 
 Aquí tienes cómo transformar el contenido de `hasOppositions()` en un **bucle dinámico** usando un array de objetos para las tarjetas. Así puedes añadir, quitar o modificar oposiciones fácilmente:
 
@@ -207,7 +394,7 @@ Así, en tu componente `tag-card`, puedes acceder al atributo `title` usando `th
 
 ### [Tables.js](file:///home/zodd/Documentos/%40Documentos/Master2024/curso%202024/2595_MEAN_ALUMNOS/MEAN/05_MEAN/04_Oposicion/view-opposition/src/components/Tables.js)
 
-## Cómo crear hiperlink a otro componente deste el componente tables?
+## Cómo crear hiperlink a otro componente desde el componente tables?
 
 Para crear un hiperlink a otro componente desde el componente `Tables`, puedes envolver el contenido de la celda con un `<a>` y, al hacer clic, disparar una función que monte el componente deseado (por ejemplo, usando un evento o manipulando el DOM).
 

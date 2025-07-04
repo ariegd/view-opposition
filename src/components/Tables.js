@@ -4,14 +4,14 @@ class Tables extends HTMLElement {
         // Ejemplo de datos, puedes cargarlo dinámicamente si lo necesitas
         this.books = [
             {
-                title: "Digital Design and Computer Architecture, ARM Edition",
+                titulo: "Digital Design and Computer Architecture, ARM Edition",
                 asignatura: "608899 - Arquitectura del nodo IoT",
                 materia: "Tecnología",
                 curso: "1º ( 1C )",
                 rowClass: "table-active"
             },
             {
-                title: "Computer Architecture- A Quantitative Approach",
+                titulo: "Computer Architecture- A Quantitative Approach",
                 asignatura: "608899 - Arquitectura del nodo IoT",
                 materia: "Tecnología",
                 curso: "1º ( 1C )",
@@ -26,9 +26,20 @@ class Tables extends HTMLElement {
         `;
     }
 
-    connectedCallback() {
+    async connectedCallback() {
+        await this.fetchBooks(); // ojo con el orden
         this.render();
         this.addEventListeners();
+    }
+
+    async fetchBooks() {
+        try {
+            const res = await fetch('http://localhost:3000/api/books');
+            this.books = await res.json();
+        } catch (err) {
+            this.books = [];
+            this.innerHTML = `<div class="alert alert-danger">No se pudieron cargar los libros.</div>`;
+        }
     }
 
     addEventListeners() {
@@ -49,6 +60,18 @@ class Tables extends HTMLElement {
     }
 
     render() {
+        const rowClasses = [
+            "table-active", 
+            "table-default", 
+            "table-primary", 
+            "table-secondary", 
+            "table-success", 
+            "table-danger", 
+            "table-warning", 
+            "table-info", 
+            "table-light",
+        ]; // Puedes añadir o quitar clases según Bootstrap
+
         this.innerHTML = /*html*/ `
             <table class="table table-hover">
                 <thead>
@@ -60,16 +83,21 @@ class Tables extends HTMLElement {
                     </tr>
                 </thead>
                 <tbody>
-                     ${this.books.map(book => `
-                        <tr class="${book.rowClass}">
-                            <th scope="row">
-                                <a href="#" class="book-link">${book.title}</a>
-                            </th>
-                            <td>${book.asignatura}</td>
-                            <td>${book.materia}</td>
-                            <td>${book.curso}</td>
-                        </tr>
-                    `).join('')}
+                    ${this.books.map((book, idx) => {
+                        // Asigna la clase siguiendo la secuencia y repitiendo si es necesario
+                        const classIndex = idx % rowClasses.length;
+                        const rowClass = rowClasses[classIndex];
+                        return `
+                            <tr class="${rowClass}">
+                                <th scope="row">
+                                    <a href="#" class="book-link">${book.titulo}</a>
+                                </th>
+                                <td>${book.asignatura}</td>
+                                <td>${book.materia}</td>
+                                <td>${book.curso}</td>
+                            </tr>
+                        `;
+                    }).join('')}
                 </tbody>
             </table>
         `;

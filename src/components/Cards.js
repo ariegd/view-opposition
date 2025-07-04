@@ -84,7 +84,7 @@ class Cards extends HTMLElement {
         document.body.appendChild(quiz);
     }
     
-     hasOppositions() {
+    hasOppositions() {
         // Agrupa las tarjetas en columnas de 3
         const columns = [[], [], [], [], [], []];
         this.oppositions.forEach((item, idx) => {
@@ -110,7 +110,6 @@ class Cards extends HTMLElement {
         </div>
         `;
     }
-
 
     hasBooks(){
         return /* html */ `
@@ -147,8 +146,6 @@ class Cards extends HTMLElement {
     }
 
     render() {
-        console.log('rendering Cards component with data:', this.data.from);
-        console.log('rendering Cards component with message:', this.data.message);
         this.innerHTML = (this.data.from === "book-link")?this.hasBooks():this.hasOppositions();
 
     }
