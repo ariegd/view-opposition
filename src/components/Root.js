@@ -42,6 +42,12 @@ class Root extends HTMLElement {
         var result = "👀 👀 ";
         
         if (this.data.from === "Ejercicios") {
+            // Elimina cualquier tag-quiz existente en el documento
+            const existingQuiz = document.querySelector('tag-quiz');
+            if (existingQuiz) {
+                existingQuiz.remove();
+            }
+
             result = /* html */`<div class="container mt-3">
                 <tag-card title="${this.data.from}"/>    
             </div>`;           

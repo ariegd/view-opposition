@@ -74,9 +74,17 @@ class Cards extends HTMLElement {
         const endpoint = materia
             ? `/api/questions/materia/${materia}?limit=${limit}&random=true`
             : `/api/questions/programa/${programa}?limit=${limit}&random=true`;
+        console.log('endpoint: ', endpoint);
 
         // Remove the current Cards component
         this.innerHTML = '';
+
+        // Elimina cualquier otro tag-quiz existente
+        const existingQuiz = document.querySelector('tag-quiz');
+        if (existingQuiz) {
+            existingQuiz.remove();
+        }
+
 
         // Create and append the Quiz component
         const quiz = document.createElement('tag-quiz');

@@ -1,6 +1,8 @@
 # view-opposition
 Vista del proyecto relacionado con los test de oposición. Utilizando bootswatch (basic) y web componentes. 
 
+   - [Si existe un <tag-quiz> cuando se llame "Ejercicios" eliminarlo desde el Root.js](#pregunta-14)
+   - [Eliminar si existe otro <tag-quiz> cuando se llame startQuiz()](#pregunta-13)
    - [Aleatorio no, seguir la secuencia del array y si se acaba comenzar por el valor inicial del array rowClasses](#pregunta-12)
    - [No se muestra nada](#pregunta-11)
    - [Reemplazar el this.books con acceso a MongoDB Cloud](#pregunta-10)
@@ -14,7 +16,43 @@ Vista del proyecto relacionado con los test de oposición. Utilizando bootswatch
    - [To change value limit=5 by this.data.message](#pregunta-2)
    - [Solution why when I change input type="range" not event click in button from Cards.js](#pregunta-1)
 
-##Pregunta 12 
+## Pregunta 14
+**Si existe un <tag-quiz> cuando se llame "Ejercicios" eliminarlo desde el Root.js**
+Para asegurarte de que **cuando se renderice `<tag-card>` en la condición `"Ejercicios"` se elimine cualquier `<tag-quiz>` existente**, puedes hacerlo justo antes de devolver el HTML en `hasMessages()`:
+
+```javascript
+if (this.data.from === "Ejercicios") {
+    // Elimina cualquier tag-quiz existente en el documento
+    const existingQuiz = document.querySelector('tag-quiz');
+    if (existingQuiz) {
+        existingQuiz.remove();
+    }
+    result = /* html */`<div class="container mt-3">
+        <tag-card title="${this.data.from}"/>    
+    </div>`;           
+}
+```
+
+**Coloca este bloque dentro de tu método `hasMessages()`**.  
+Así, cada vez que se muestre `<tag-card>` por la opción "Ejercicios", se eliminará cualquier `<tag-quiz>` que haya en el DOM.
+
+## Pregunta 13
+**Eliminar si existe otro <tag-quiz> cuando se llame startQuiz()**
+
+Para asegurarte de que solo haya un <tag-quiz> en el documento, elimina cualquier otro existente antes de añadir uno nuevo. Puedes hacerlo así en tu método startQuiz:
+
+```javascript
+    // Elimina cualquier otro tag-quiz existente
+    const existingQuiz = document.querySelector('tag-quiz');
+    if (existingQuiz) {
+        existingQuiz.remove();
+    }
+```
+
+Así, siempre tendrás solo un <tag-quiz> en el DOM.
+
+
+## Pregunta 12 
 **aleatorio no, seguir la secuencia del array rowClasses**
 
 Para asignar las clases de rowClasses siguiendo el orden y, si se acaban, volver a empezar desde el principio (circular), simplemente usa el índice del libro y el operador módulo (%) sobre la longitud del array de clases.
@@ -403,7 +441,7 @@ Así, en tu componente `tag-card`, puedes acceder al atributo `title` usando `th
 
 ### [Tables.js](file:///home/zodd/Documentos/%40Documentos/Master2024/curso%202024/2595_MEAN_ALUMNOS/MEAN/05_MEAN/04_Oposicion/view-opposition/src/components/Tables.js)
 
-## Pregunra 5
+## Pregunta 5
 **Cómo crear hiperlink a otro componente desde el componente tables?**
 
 Para crear un hiperlink a otro componente desde el componente `Tables`, puedes envolver el contenido de la celda con un `<a>` y, al hacer clic, disparar una función que monte el componente deseado (por ejemplo, usando un evento o manipulando el DOM).
