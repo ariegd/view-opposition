@@ -41,12 +41,26 @@ class Cards extends HTMLElement {
         `;
     }
 
-    connectedCallback() {
+    async connectedCallback() {
         document.addEventListener("user:nav-ejercicios", this);
         document.addEventListener("user:jumbo-input", this); // Listen for updates from Jumbo.js
         this.data.from = this.getAttribute('title')
+        // Si el modo es "book-link", carga los qbooks del libro seleccionado
+        if (this.data.from === "book-link") {
+            const books_id = this.getAttribute('books_id'); // O como lo recibas
+            await this.fetchQBooks(books_id);
+        }
         this.render();
         this.addEventListeners();
+    }
+
+    async fetchQBooks(books_id) {
+        try {
+            const res = await fetch(`http://localhost:3000/api/qbooks/id/${books_id}`);
+            this.qbooks = await res.json();
+        } catch (err) {
+            this.qbooks = [];
+        }
     }
 
     disconnectedCallback() {
@@ -120,35 +134,63 @@ class Cards extends HTMLElement {
     }
 
     hasBooks(){
+        if (!this.qbooks.length) {
+            return /* html */ `
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card text-white bg-primary mb-3" style="max-width: 20rem;">
+                        <div class="card-header">Header</div>
+                        <div class="card-body">
+                            <h4 class="card-title">Chapter 1</h4>
+                            <p class="card-text"><output>${this.data.message}</output> preguntas</p>
+                            <button type="button" class="btn btn-success" data-programa="ag">Start Quiz</button>
+                        </div>
+                    </div>
+                    <div class="card text-white bg-secondary mb-3" style="max-width: 20rem;">
+                        <div class="card-header">Header</div>
+                        <div class="card-body">
+                            <h4 class="card-title">Chapter 2</h4>
+                            <p class="card-text"><output>${this.data.message}</output> preguntas</p>
+                            <button type="button" class="btn btn-success" data-programa="sc">Start Quiz</button>
+                        </div>
+                    </div>
+                    <div class="card bg-light mb-3" style="max-width: 20rem;">
+                        <div class="card-header">Header</div>
+                        <div class="card-body">
+                            <h4 class="card-title">Chapter 3</h4>
+                            <p class="card-text"><output>${this.data.message}</output> preguntas</p>
+                            <button type="button" class="btn btn-success" data-materia="ED">Start Quiz</button>
+                        </div>
+                    </div>
+                </div>
+            
+            </div>
+            `;
+        }
+
+        // Agrupa por capítulo
+        const chapters = {};
+        this.qbooks.forEach(qbook => {
+            const cap = qbook.capitulo || "Sin capítulo";
+            if (!chapters[cap]) chapters[cap] = [];
+            chapters[cap].push(qbook);
+        });
+
+        // Renderiza una card por capítulo
         return /* html */ `
         <div class="row">
-            <div class="col-md-4">
-                <div class="card text-white bg-primary mb-3" style="max-width: 20rem;">
-                    <div class="card-header">Header</div>
-                    <div class="card-body">
-                        <h4 class="card-title">Chapter 1</h4>
-                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                        <button type="button" class="btn btn-success" data-programa="ag">Start Quiz</button>
+            ${Object.entries(chapters).map(([capitulo, qbooks]) => `
+                <div class="col-md-4">
+                    <div class="card text-white bg-primary mb-3" style="max-width: 20rem;">
+                        <div class="card-header">${qbooks[0].header || "Header"}</div>
+                        <div class="card-body">
+                            <h4 class="card-title">Capítulo ${capitulo}</h4>
+                            <p class="card-text"><output>${qbooks.length}</output> preguntas</p>
+                            <button type="button" class="btn btn-success" data-qbookid="${qbooks[0]._id}">Start Quiz</button>
+                        </div>
                     </div>
                 </div>
-                <div class="card text-white bg-secondary mb-3" style="max-width: 20rem;">
-                    <div class="card-header">Header</div>
-                    <div class="card-body">
-                        <h4 class="card-title">Chapter 2</h4>
-                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                        <button type="button" class="btn btn-success" data-programa="sc">Start Quiz</button>
-                    </div>
-                </div>
-                <div class="card bg-light mb-3" style="max-width: 20rem;">
-                    <div class="card-header">Header</div>
-                    <div class="card-body">
-                        <h4 class="card-title">Chapter 3</h4>
-                        <p class="card-text"><output>${this.data.message}</output> preguntas</p>
-                        <button type="button" class="btn btn-success" data-materia="ED">Start Quiz</button>
-                    </div>
-                </div>
-            </div>
-           
+            `).join('')}
         </div>
         `;
     }

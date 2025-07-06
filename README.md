@@ -1,6 +1,10 @@
 # view-opposition
 Vista del proyecto relacionado con los test de oposición. Utilizando bootswatch (basic) y web componentes. 
 
+   - [agrupar todas las preguntas de un mismo capitulo en un solo cards](#pregunta-18)
+   - [detail: { from: "book-link", message: title } pasar el books_id](#pregunta-17)
+   - [cargar dinamicamente las Cards que pertenece a una determinada qBookModel.js dependiendo del books_id](#pregunta-16)
+   - [hasBooks() cargar las Cards de la base de datos MongoDB](#pregunta-15)
    - [Si existe un <tag-quiz> cuando se llame "Ejercicios" eliminarlo desde el Root.js](#pregunta-14)
    - [Eliminar si existe otro <tag-quiz> cuando se llame startQuiz()](#pregunta-13)
    - [Aleatorio no, seguir la secuencia del array y si se acaba comenzar por el valor inicial del array rowClasses](#pregunta-12)
@@ -15,6 +19,279 @@ Vista del proyecto relacionado con los test de oposición. Utilizando bootswatch
    - [Fetch question from data-materia and data-programa](#pregunta-3)
    - [To change value limit=5 by this.data.message](#pregunta-2)
    - [Solution why when I change input type="range" not event click in button from Cards.js](#pregunta-1)
+
+## Pregunta 18
+**agrupar todas las preguntas de un mismo capitulo en un solo cards**
+Para agrupar todas las preguntas de un mismo capítulo en una sola card, primero necesitas agrupar los elementos de this.qbooks por el campo capitulo. Luego, para cada capítulo, renderizas una sola card que representa ese capítulo.
+
+Aquí tienes cómo hacerlo:
+```
+    hasBooks() {
+        if (!this.qbooks.length) {
+            return /* html */ `
+            <div class="alert alert-info">No hay capítulos para este libro.</div>
+            `;
+        }
+
+        // Agrupa por capítulo
+        const chapters = {};
+        this.qbooks.forEach(qbook => {
+            const cap = qbook.capitulo || "Sin capítulo";
+            if (!chapters[cap]) chapters[cap] = [];
+            chapters[cap].push(qbook);
+        });
+
+        // Renderiza una card por capítulo
+        return /* html */ `
+        <div class="row">
+            ${Object.entries(chapters).map(([capitulo, qbooks]) => `
+                <div class="col-md-4">
+                    <div class="card text-white bg-primary mb-3" style="max-width: 20rem;">
+                        <div class="card-header">${qbooks[0].header || "Header"}</div>
+                        <div class="card-body">
+                            <h4 class="card-title">Capítulo ${capitulo}</h4>
+                            <p class="card-text"><output>${this.data.message}</output> preguntas</p>
+                            <button type="button" class="btn btn-success" data-qbookid="${qbooks[0]._id}">Start Quiz</button>
+                            <p class="small text-white-50">Preguntas en este capítulo: ${qbooks.length}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+        `;
+    }
+```
+Explicación:
+
+Se agrupa this.qbooks por el campo capitulo.
+Se renderiza una sola card por cada capítulo, mostrando el número de preguntas agrupadas.
+El botón puede usar el _id del primer qbook del capítulo, o puedes adaptar la lógica para lanzar el quiz de todo el capítulo.
+Así, tendrás una card por capítulo, no una por pregunta!
+
+## Pregunta 17
+**detail: { from: "book-link", message: title } pasar el books_id**
+Para pasar también el `books_id` en el evento personalizado, simplemente inclúyelo en el objeto `detail`.  
+Supongamos que cada objeto `book` tiene una propiedad `id` o `_id` (como suele venir de MongoDB).  
+Modifica el listener así:
+
+```javascript
+addEventListeners() {
+    const links = this.querySelectorAll('.book-link');
+    links.forEach((link, idx) => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const title = link.textContent;
+            const book = this.books[idx]; // Obtén el libro correspondiente por índice
+            // Lanza el CustomEvent con el título y el books_id
+            this.dispatchEvent(new CustomEvent("tables:book-selected", {
+                detail: { from: "book-link", message: title, books_id: book._id || book.id },
+                bubbles: true,
+                composed: true
+            }));
+        });
+    });
+}
+```
+
+**Ahora el evento llevará también el `books_id` del libro seleccionado en `detail.books_id`.**
+
+## Pregunta 16
+**cargar dinamicamente las Cards que pertenece a una determinada qBookModel.js dependiendo del books_id**
+Para cargar dinámicamente las Cards que pertenecen a una determinada colección `qBookModel.js` dependiendo del `books_id`, debes:
+
+1. **Crear un endpoint en tu backend** que devuelva los "qbooks" filtrados por `books_id`.
+2. **Hacer un fetch en el frontend** (en tu componente `Cards`) usando ese `books_id`.
+3. **Renderizar las cards** usando los datos recibidos.
+
+---
+
+### 1. Backend: Endpoint para filtrar por `books_id`
+
+Supón que tienes un modelo `qBookModel.js` y quieres obtener los qbooks de un libro:
+
+```javascript
+// src/routes/qBookRoutes.js
+const express = require('express');
+const router = express.Router();
+const QBook = require('../models/qBookModel');
+
+router.get('/qbooks/:bookId', async (req, res) => {
+    try {
+        const qbooks = await QBook.find({ books_id: req.params.bookId });
+        res.json(qbooks);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+module.exports = router;
+```
+
+---
+
+### 2. Frontend: Cards.js
+
+Modifica tu componente para:
+- Recibir el `books_id` como atributo o desde `this.data`.
+- Hacer fetch a `/api/qbooks/${books_id}`.
+- Renderizar las cards con los datos recibidos.
+
+```javascript
+class Cards extends HTMLElement {
+    constructor() {
+        super();
+        this.data = {};
+        this.data.message = '25';
+        this.qbooks = []; // Aquí se guardarán los qbooks filtrados
+    }
+
+    async connectedCallback() {
+        document.addEventListener("user:nav-ejercicios", this);
+        document.addEventListener("user:jumbo-input", this);
+        this.data.from = this.getAttribute('title');
+        // Si el modo es "book-link", carga los qbooks del libro seleccionado
+        if (this.data.from === "book-link") {
+            const books_id = this.getAttribute('books_id'); // O como lo recibas
+            await this.fetchQBooks(books_id);
+        }
+        this.render();
+        this.addEventListeners();
+    }
+
+    async fetchQBooks(books_id) {
+        try {
+            const res = await fetch(`http://localhost:3000/api/qbooks/${books_id}`);
+            this.qbooks = await res.json();
+        } catch (err) {
+            this.qbooks = [];
+        }
+    }
+
+    hasBooks() {
+        if (!this.qbooks.length) {
+            return `<div class="alert alert-info">No hay capítulos para este libro.</div>`;
+        }
+        return /* html */ `
+        <div class="row">
+            ${this.qbooks.map(qbook => `
+                <div class="col-md-4">
+                    <div class="card text-white bg-primary mb-3" style="max-width: 20rem;">
+                        <div class="card-header">${qbook.header || "Header"}</div>
+                        <div class="card-body">
+                            <h4 class="card-title">${qbook.titulo || qbook.chapter || "Capítulo"}</h4>
+                            <p class="card-text"><output>${this.data.message}</output> preguntas</p>
+                            <button type="button" class="btn btn-success" data-qbookid="${qbook._id}">Start Quiz</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+        `;
+    }
+
+    render() {
+        this.innerHTML = (this.data.from === "book-link") ? this.hasBooks() : this.hasOppositions();
+    }
+
+    // ...resto del código...
+}
+
+customElements.define("tag-card", Cards);
+```
+
+---
+
+### 3. Cómo pasar el `books_id` al componente
+
+Cuando crees `<tag-card>`, pásale el atributo `books_id`:
+
+```javascript
+<tag-card title="book-link" books_id="EL_ID_DEL_LIBRO"/>
+```
+
+---
+
+**Resumen:**  
+- El backend expone `/api/qbooks/:bookId` para filtrar capítulos por libro.
+- El frontend usa ese endpoint y renderiza las cards dinámicamente según el libro seleccionado.
+- Así, solo se muestran los capítulos/cards que pertenecen al libro (`books_id`) seleccionado.
+
+## Pregunta 15
+**hasBooks() cargar las Cards de la base de datos MongoDB**
+Para que `hasBooks()` cargue las cards dinámicamente desde la base de datos MongoDB, debes:
+
+1. **Obtener los libros desde tu API REST (que consulta MongoDB).**
+2. **Guardar los libros en una propiedad del componente.**
+3. **Renderizar las cards usando esos datos.**
+
+Aquí tienes cómo hacerlo:
+
+---
+
+```javascript
+class Cards extends HTMLElement {
+    constructor() {
+        super();
+        this.data = {};
+        this.data.message = '25';
+        this.books = []; // Aquí se guardarán los libros de la API
+        // ...this.oppositions...
+    }
+
+    async connectedCallback() {
+        document.addEventListener("user:nav-ejercicios", this);
+        document.addEventListener("user:jumbo-input", this);
+        this.data.from = this.getAttribute('title');
+        if (this.data.from === "book-link") {
+            await this.fetchBooks(); // Espera a cargar los libros antes de renderizar
+        }
+        this.render();
+        this.addEventListeners();
+    }
+
+    async fetchBooks() {
+        try {
+            const res = await fetch('http://localhost:3000/api/books');
+            this.books = await res.json();
+        } catch (err) {
+            this.books = [];
+        }
+    }
+
+    hasBooks() {
+        if (!this.books.length) {
+            return `<div class="alert alert-info">Cargando libros...</div>`;
+        }
+        return /* html */ `
+        <div class="row">
+            ${this.books.map(book => `
+                <div class="col-md-4">
+                    <div class="card text-white bg-primary mb-3" style="max-width: 20rem;">
+                        <div class="card-header">Header</div>
+                        <div class="card-body">
+                            <h4 class="card-title">${book.titulo}</h4>
+                            <p class="card-text"><output>${this.data.message}</output> preguntas</p>
+                            <button type="button" class="btn btn-success" data-programa="${book.programa || ''}" data-materia="${book.materia || ''}">Start Quiz</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+        `;
+    }
+
+    // ...resto del código (hasOppositions, addEventListeners, startQuiz, render, etc.)...
+}
+```
+
+**Puntos clave:**
+- `fetchBooks()` obtiene los libros de la API y los guarda en `this.books`.
+- `hasBooks()` genera las cards dinámicamente usando los datos de `this.books`.
+- En `connectedCallback()`, si el modo es `"book-link"`, primero espera a cargar los libros antes de renderizar.
+
+**Así, las cards de libros se cargarán dinámicamente desde MongoDB!**
+
+
 
 ## Pregunta 14
 **Si existe un <tag-quiz> cuando se llame "Ejercicios" eliminarlo desde el Root.js**

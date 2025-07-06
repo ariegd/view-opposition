@@ -64,7 +64,7 @@ class Root extends HTMLElement {
         }
         else if (this.data.from === "book-link") {
             result = /* html */`<div class="container mt-3">
-                <tag-card title="${this.data.from}"/>
+                <tag-card title="${this.data.from}" books_id="${this.data.books_id}"/>
             </div>`; 
         }
 

@@ -37,7 +37,7 @@ class Tables extends HTMLElement {
             const res = await fetch('http://localhost:3000/api/books');
             this.books = await res.json();
         } catch (err) {
-            this.books = [];
+            //this.books = [];
             this.innerHTML = `<div class="alert alert-danger">No se pudieron cargar los libros.</div>`;
         }
     }
@@ -45,13 +45,14 @@ class Tables extends HTMLElement {
     addEventListeners() {
         // Añade el evento personalizado a cada enlace de libro
         const links = this.querySelectorAll('.book-link');
-        links.forEach(link => {
+        links.forEach((link, idx) => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 const title = link.textContent;
+                const book = this.books[idx]; // Obtén el libro correspondiente por índice
                 // Lanza el CustomEvent con el título del libro
                 this.dispatchEvent(new CustomEvent("tables:book-selected", {
-                    detail: { from: "book-link", message: title },
+                    detail: { from: "book-link", message: title, books_id: book._id || book.id },
                     bubbles: true,
                     composed: true
                 }));
