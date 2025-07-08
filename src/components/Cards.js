@@ -74,21 +74,29 @@ class Cards extends HTMLElement {
             button.addEventListener('click', (event) => {
                 const materia = event.target.getAttribute('data-materia'); // Get the data-materia attribute
                 const programa = event.target.getAttribute('data-programa'); // Get the data-programa attribute
-                this.startQuiz(materia, programa); // Pass both attributes to startQuiz
+                const qbookid = event.target.getAttribute('data-qbookid'); // Nuevo: para capítulos
+                const capitulo = event.target.getAttribute('data-capitulo');
+                this.startQuiz(materia, programa, qbookid, capitulo);
             });
         });
     }
 
-    startQuiz(materia, programa) {
+    startQuiz(materia, programa, qbookid, capitulo) {
         // Use this.data.message as the limit
         const limit = this.data.message;
-        console.log('limit', limit);
+        let endpoint;
 
-        // Determine the API endpoint based on the attribute
-        const endpoint = materia
-            ? `/api/questions/materia/${materia}?limit=${limit}&random=true`
-            : `/api/questions/programa/${programa}?limit=${limit}&random=true`;
-        console.log('endpoint: ', endpoint);
+    if (qbookid && capitulo) {
+        // Quiz para el capítulo específico de un libro
+        endpoint = `/api/qbooks/id/${qbookid}/capitulo/${capitulo}?limit=${limit}&random=true`;
+    } else if (qbookid) {
+        endpoint = `/api/qbooks/id/${qbookid}?limit=${limit}&random=true`;
+    } else {
+            // Quiz general por materia o programa
+            endpoint = materia
+                ? `/api/questions/materia/${materia}?limit=${limit}&random=true`
+                : `/api/questions/programa/${programa}?limit=${limit}&random=true`;
+        }
 
         // Remove the current Cards component
         this.innerHTML = '';
@@ -99,7 +107,7 @@ class Cards extends HTMLElement {
             existingQuiz.remove();
         }
 
-
+        console.log(`Starting quiz with endpoint: ${endpoint}`);
         // Create and append the Quiz component
         const quiz = document.createElement('tag-quiz');
         quiz.setAttribute('endpoint', endpoint); // Pass the endpoint to the Quiz component
@@ -186,7 +194,11 @@ class Cards extends HTMLElement {
                         <div class="card-body">
                             <h4 class="card-title">Capítulo ${capitulo}</h4>
                             <p class="card-text"><output>${qbooks.length}</output> preguntas</p>
-                            <button type="button" class="btn btn-success" data-qbookid="${qbooks[0]._id}">Start Quiz</button>
+                            <button type="button" class="btn btn-success" 
+                                data-qbookid="${qbooks[0].books_id}" 
+                                data-capitulo="${capitulo}">
+                                Start Quiz
+                            </button>
                         </div>
                     </div>
                 </div>

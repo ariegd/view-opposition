@@ -15,10 +15,12 @@ class Quiz extends HTMLElement {
     async fetchQuizData(endpoint) {
         try {
             const response = await fetch('http://localhost:3000' + endpoint); // Use the endpoint passed as an attribute
+            
             if (!response.ok) {
                 throw new Error(`Failed to fetch quiz data: ${response.statusText}`);
             }
             this.quizData = await response.json();
+            console.log('Quiz data:', this.quizData); // <-- Añade esto
             this.loadQuestion();
         } catch (error) {
             console.error(error);
@@ -28,6 +30,11 @@ class Quiz extends HTMLElement {
 
     loadQuestion() {
         const question = this.quizData[this.currentQuestion];
+        if (!question) {
+            this.quizContainer.innerHTML = `<p class="error">No hay preguntas disponibles.</p>`;
+            return;
+        }
+
         this.questionEl.textContent = question.pregunta;
         this.optionsEl.innerHTML = '';
         question.opciones.forEach((option, index) => {

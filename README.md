@@ -1,6 +1,8 @@
 # view-opposition
 Vista del proyecto relacionado con los test de oposición. Utilizando bootswatch (basic) y web componentes. 
 
+   - [ejecutar startQuiz por qbookid y capitulo](#pregunta-20)
+   - [startQuiz para la hasBooks()](#pregunta-19)
    - [agrupar todas las preguntas de un mismo capitulo en un solo cards](#pregunta-18)
    - [detail: { from: "book-link", message: title } pasar el books_id](#pregunta-17)
    - [cargar dinamicamente las Cards que pertenece a una determinada qBookModel.js dependiendo del books_id](#pregunta-16)
@@ -19,6 +21,136 @@ Vista del proyecto relacionado con los test de oposición. Utilizando bootswatch
    - [Fetch question from data-materia and data-programa](#pregunta-3)
    - [To change value limit=5 by this.data.message](#pregunta-2)
    - [Solution why when I change input type="range" not event click in button from Cards.js](#pregunta-1)
+
+## Pregunta 20
+**ejecutar startQuiz por qbookid y capitulo**
+Para ejecutar `startQuiz` por **qbookid** y **capítulo**, necesitas que el botón de cada card de capítulo pase ambos datos como atributos (por ejemplo, `data-qbookid` y `data-capitulo`), y luego los uses en tu función `startQuiz` para construir el endpoint adecuado.
+
+Aquí tienes cómo hacerlo:
+
+---
+
+### 1. Modifica el botón en `hasBooks()` para incluir ambos atributos
+
+```javascript
+<button type="button" class="btn btn-success"
+    data-qbookid="${qbooks[0].books_id}"
+    data-capitulo="${capitulo}">
+    Start Quiz
+</button>
+```
+
+---
+
+### 2. Modifica `addEventListeners()` para recoger ambos atributos
+
+```javascript
+addEventListeners() {
+    const buttons = this.querySelectorAll('.btn-success');
+    buttons.forEach(button => {
+        button.addEventListener('click', (event) => {
+            const materia = event.target.getAttribute('data-materia');
+            const programa = event.target.getAttribute('data-programa');
+            const qbookid = event.target.getAttribute('data-qbookid');
+            const capitulo = event.target.getAttribute('data-capitulo');
+            this.startQuiz(materia, programa, qbookid, capitulo);
+        });
+    });
+}
+```
+
+---
+
+### 3. Modifica `startQuiz` para construir el endpoint usando ambos parámetros
+
+```javascript
+startQuiz(materia, programa, qbookid, capitulo) {
+    const limit = this.data.message;
+    let endpoint;
+
+    if (qbookid && capitulo) {
+        // Quiz para el capítulo específico de un libro
+        endpoint = `/api/qbooks/id/${qbookid}/capitulo/${capitulo}?limit=${limit}&random=true`;
+    } else if (qbookid) {
+        endpoint = `/api/qbooks/id/${qbookid}?limit=${limit}&random=true`;
+    } else {
+        endpoint = materia
+            ? `/api/questions/materia/${materia}?limit=${limit}&random=true`
+            : `/api/questions/programa/${programa}?limit=${limit}&random=true`;
+    }
+
+    this.innerHTML = '';
+
+    const existingQuiz = document.querySelector('tag-quiz');
+    if (existingQuiz) {
+        existingQuiz.remove();
+    }
+
+    const quiz = document.createElement('tag-quiz');
+    quiz.setAttribute('endpoint', endpoint);
+    document.body.appendChild(quiz);
+}
+```
+
+---
+
+**Con esto, al pulsar el botón de un capítulo, se ejecutará el quiz solo para ese `books_id` y `capitulo`.**
+
+
+
+
+
+## Pregunta 19
+**startQuiz para la hasBooks()**
+
+Para que el botón **Start Quiz** de cada card en `hasBooks()` funcione correctamente y lance el quiz solo con las preguntas de ese capítulo, debes modificar el método `addEventListeners()` y el método `startQuiz` para aceptar el atributo `data-qbookid` (o el identificador de capítulo).
+
+Aquí tienes cómo hacerlo:
+
+```javascript
+addEventListeners() {
+    const buttons = this.querySelectorAll('.btn-success');
+    buttons.forEach(button => {
+        button.addEventListener('click', (event) => {
+            const materia = event.target.getAttribute('data-materia');
+            const programa = event.target.getAttribute('data-programa');
+            const qbookid = event.target.getAttribute('data-qbookid'); // Nuevo: para capítulos
+            this.startQuiz(materia, programa, qbookid);
+        });
+    });
+}
+
+startQuiz(materia, programa, qbookid) {
+    const limit = this.data.message;
+    let endpoint;
+
+    if (qbookid) {
+        // Quiz solo para el capítulo (qbook)
+        endpoint = `/api/questions/qbook/${qbookid}?limit=${limit}&random=true`;
+    } else {
+        // Quiz general por materia o programa
+        endpoint = materia
+            ? `/api/questions/materia/${materia}?limit=${limit}&random=true`
+            : `/api/questions/programa/${programa}?limit=${limit}&random=true`;
+    }
+
+    this.innerHTML = '';
+
+    const existingQuiz = document.querySelector('tag-quiz');
+    if (existingQuiz) {
+        existingQuiz.remove();
+    }
+
+    const quiz = document.createElement('tag-quiz');
+    quiz.setAttribute('endpoint', endpoint);
+    document.body.appendChild(quiz);
+}
+```
+
+**Resumen:**  
+- Si el botón tiene `data-qbookid`, el quiz será solo para ese capítulo.
+- Si no, funcionará como antes (por materia o programa).
+- Así, los quizzes por capítulo funcionarán correctamente desde las cards agrupadas.
 
 ## Pregunta 18
 **agrupar todas las preguntas de un mismo capitulo en un solo cards**
