@@ -37,6 +37,19 @@ class Quiz extends HTMLElement {
 
         this.questionEl.textContent = question.pregunta;
         this.optionsEl.innerHTML = '';
+
+        // Mostrar imagen si existe
+        const existingImg = this.quizContainer.querySelector('.question-img');
+        if (existingImg) existingImg.remove();
+        if (question.imagen) {
+            const img = document.createElement('img');
+            img.src = question.imagen;
+            img.alt = "Imagen de la pregunta";
+            img.className = "question-img mb-3";
+            img.style.maxWidth = "100%";
+            this.questionEl.parentNode.insertBefore(img, this.questionEl.nextSibling);
+        }
+
         question.opciones.forEach((option, index) => {
             const button = document.createElement('button');
             button.textContent = option;

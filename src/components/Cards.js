@@ -28,11 +28,15 @@ class Cards extends HTMLElement {
     }
 
     handleEvent(event) {
-        if (event.type === "user:nav-ejercicios" || 
-            event.type === "user:jumbo-input") {
-            this.data = event.detail; // Update data from the event
-            this.render(); // Re-render the component
-            this.addEventListeners(); // Re-attach event listeners
+        if (event.type === "user:nav-ejercicios" || event.type === "user:jumbo-input") {
+            // Solo actualiza el mensaje, no sobrescribas 'from' si ya es 'book-link'
+            if (this.data.from === "book-link") {
+                this.data.message = event.detail.message;
+            } else {
+                this.data = event.detail;
+            }
+            this.render();
+            this.addEventListeners();
         }
     }
 

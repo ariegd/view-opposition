@@ -51,6 +51,7 @@ class Jumbotron extends HTMLElement {
                 <div class="mt-4 p-5 bg-info text-white rounded">
                     <h1>${this.data.message}</h1> 
                     <p>Coordinador: Francisco Igual Peña (figual@ucm.es),   <a href="https://informatica.ucm.es/master-en-internet-de-las-cosas" target="_blank" style="color: white;">Web oficial del máster</a>  </p> 
+
                 </div>
             </div> `;
     }
@@ -74,13 +75,14 @@ class Jumbotron extends HTMLElement {
     }
 
     render() {
-        this.innerHTML = (this.data.from === "Ejercicios")? this.hasRange() : this.noRange();
-        if (this.data.from === "Ejercicios") {
-
+        // Mostrar el rango si es "Ejercicios" o "book-link"
+        if (this.data.from === "Ejercicios" || this.data.from === "book-link") {
+            this.innerHTML = this.hasRange();
             this.output = document.querySelector("output");
             const range = document.querySelector("#pi_input");
-
             range.addEventListener("input", this);
+        } else {
+            this.innerHTML = this.noRange();
         }
     }
 

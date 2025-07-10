@@ -1,6 +1,8 @@
 # view-opposition
 Vista del proyecto relacionado con los test de oposición. Utilizando bootswatch (basic) y web componentes. 
 
+   - [cuando el usuario lance el evento user:jumbo-input no cambie de hasBooks() a hasOppositions()](#pregunta-22)
+   - [tables:book-selected cuando se lance este evento crear en el jumbo.js customRange3](#pregunta-21)
    - [ejecutar startQuiz por qbookid y capitulo](#pregunta-20)
    - [startQuiz para la hasBooks()](#pregunta-19)
    - [agrupar todas las preguntas de un mismo capitulo en un solo cards](#pregunta-18)
@@ -22,8 +24,69 @@ Vista del proyecto relacionado con los test de oposición. Utilizando bootswatch
    - [To change value limit=5 by this.data.message](#pregunta-2)
    - [Solution why when I change input type="range" not event click in button from Cards.js](#pregunta-1)
 
+## Pregunta 22
+**cuando el usuario lance el evento user:jumbo-input no cambie de hasBooks() a hasOppositions()**
+
+Para que **cuando el usuario lance el evento `user:jumbo-input` no cambie de `hasBooks()` a `hasOppositions()`**, debes asegurarte de que el valor de `this.data.from` no se sobrescriba accidentalmente en el handler del evento, y que el método `render()` siga mostrando `hasBooks()` si el modo es `"book-link"`.
+
+Actualmente, en tu método `handleEvent`, haces:
+
+```javascript
+this.data = event.detail; // Update data from the event
+this.render(); // Re-render the component
+this.addEventListeners(); // Re-attach event listeners
+```
+
+Esto puede sobrescribir `this.data.from` y perder el valor `"book-link"`.
+
+### Solución
+
+**Solo actualiza el campo que necesitas (por ejemplo, `message`) y no sobrescribas `from` si ya está en `"book-link"`:**
+
+```javascript
+handleEvent(event) {
+    if (event.type === "user:nav-ejercicios" || event.type === "user:jumbo-input") {
+        // Solo actualiza el mensaje, no sobrescribas 'from' si ya es 'book-link'
+        if (this.data.from === "book-link") {
+            this.data.message = event.detail.message;
+        } else {
+            this.data = event.detail;
+        }
+        this.render();
+        this.addEventListeners();
+    }
+}
+```
+
+**Así, si el usuario está en modo `"book-link"`, el componente seguirá mostrando `hasBooks()` aunque cambie el valor del rango, y no volverá a `hasOppositions()`.**
+
+
+## Pregunta 21
+**tables:book-selected cuando se lance este evento crear en el jumbo.js customRange3**
+
+Para que cuando se lance el evento `tables:book-selected` se cree el input de rango (`customRange3`) en Jumbo.js, solo tienes que modificar el método `render()` para que también muestre el rango cuando `this.data.from === "book-link"` (además de `"Ejercicios"`).
+
+**Modifica la condición en `render()` así:**
+
+```javascript
+render() {
+    // Mostrar el rango si es "Ejercicios" o "book-link"
+    if (this.data.from === "Ejercicios" || this.data.from === "book-link") {
+        this.innerHTML = this.hasRange();
+        this.output = document.querySelector("output");
+        const range = document.querySelector("#pi_input");
+        range.addEventListener("input", this);
+    } else {
+        this.innerHTML = this.noRange();
+    }
+}
+```
+
+**Así, cuando se lance `tables:book-selected` y el evento lleve `{ from: "book-link", ... }`, el input de rango aparecerá en el jumbotron.**
+
 ## Pregunta 20
 **ejecutar startQuiz por qbookid y capitulo**
+
 Para ejecutar `startQuiz` por **qbookid** y **capítulo**, necesitas que el botón de cada card de capítulo pase ambos datos como atributos (por ejemplo, `data-qbookid` y `data-capitulo`), y luego los uses en tu función `startQuiz` para construir el endpoint adecuado.
 
 Aquí tienes cómo hacerlo:
