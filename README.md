@@ -1,6 +1,7 @@
 # view-opposition
 Vista del proyecto relacionado con los test de oposición. Utilizando bootswatch (basic) y web componentes. 
 
+   - [Una vez finalizado de realizar las question en el Quiz.js mostrar las respuestas correctas e incorrectas](#pregunta-23)
    - [cuando el usuario lance el evento user:jumbo-input no cambie de hasBooks() a hasOppositions()](#pregunta-22)
    - [tables:book-selected cuando se lance este evento crear en el jumbo.js customRange3](#pregunta-21)
    - [ejecutar startQuiz por qbookid y capitulo](#pregunta-20)
@@ -23,6 +24,68 @@ Vista del proyecto relacionado con los test de oposición. Utilizando bootswatch
    - [Fetch question from data-materia and data-programa](#pregunta-3)
    - [To change value limit=5 by this.data.message](#pregunta-2)
    - [Solution why when I change input type="range" not event click in button from Cards.js](#pregunta-1)
+ 
+ 
+## Pregunta 23
+**Una vez finalizado de realizar las question en el Quiz.js mostrar las respuestas correctas e incorrectas**
+
+Puedes mostrar las respuestas correctas e incorrectas al finalizar el quiz agregando un resumen detallado en el método `showResults()`.  
+Aquí tienes una versión mejorada que muestra cada pregunta, la respuesta correcta y la respuesta seleccionada por el usuario:
+
+```javascript
+showResults() {
+    // Guarda las respuestas del usuario durante el quiz
+    if (!this.userAnswers) this.userAnswers = [];
+    // Construye el resumen de resultados
+    let summary = '<h4>Resumen de respuestas:</h4><ul class="list-group mb-3">';
+    this.quizData.forEach((q, i) => {
+        const userAnswer = this.userAnswers[i];
+        const correctAnswer = q.opciones[q.respuesta];
+        const userAnswerText = userAnswer !== undefined ? q.opciones[userAnswer] : '<em>No respondida</em>';
+        const isCorrect = userAnswer === q.respuesta;
+        summary += `
+            <li class="list-group-item d-flex flex-column ${isCorrect ? 'list-group-item-success' : 'list-group-item-danger'}">
+                <strong>Pregunta ${i + 1}:</strong> ${q.pregunta}<br>
+                <span>Tu respuesta: ${userAnswerText}</span>
+                <span>Respuesta correcta: ${correctAnswer}</span>
+            </li>
+        `;
+    });
+    summary += '</ul>';
+
+    this.quizContainer.innerHTML = `
+        <div class="results">
+            <div class="result-icon">
+                <i class="fas ${this.score > this.quizData.length / 2 ? 'fa-trophy text-success' : 'fa-times-circle text-danger'}"></i>
+            </div>
+            <div class="score">Your score: ${this.score}/${this.quizData.length}</div>
+            <p>${this.score > this.quizData.length / 2 ? 'Great job!' : 'Better luck next time!'}</p>
+            ${summary}
+            <button class="btn btn-primary" id="save-score-btn">Save Score</button>
+            <button class="btn btn-secondary" onclick="location.reload()">Restart Quiz</button>
+        </div>
+    `;
+
+    document.getElementById('save-score-btn').addEventListener('click', () => this.saveScore());
+}
+```
+
+Y en tu método `selectOption`, guarda la respuesta del usuario:
+
+```javascript
+selectOption(selectedButton, optionIndex) {
+    const buttons = this.optionsEl.getElementsByClassName('option');
+    Array.from(buttons).forEach(button => button.classList.remove('selected'));
+    selectedButton.classList.add('selected');
+    this.nextBtn.style.display = 'block';
+
+    // Guarda la respuesta del usuario
+    if (!this.userAnswers) this.userAnswers = [];
+    this.userAnswers[this.currentQuestion] = optionIndex;
+}
+```
+
+**Con esto, al finalizar el quiz, se mostrará un resumen con cada pregunta, la respuesta correcta y la respuesta seleccionada por el usuario, resaltando si fue correcta o incorrecta.**
 
 ## Pregunta 22
 **cuando el usuario lance el evento user:jumbo-input no cambie de hasBooks() a hasOppositions()**

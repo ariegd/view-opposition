@@ -69,6 +69,10 @@ class Quiz extends HTMLElement {
         Array.from(buttons).forEach(button => button.classList.remove('selected'));
         selectedButton.classList.add('selected');
         this.nextBtn.style.display = 'block';
+
+        // Guarda la respuesta del usuario
+        if (!this.userAnswers) this.userAnswers = [];
+        this.userAnswers[this.currentQuestion] = optionIndex;
     }
 
     startTimer() {
@@ -128,6 +132,25 @@ class Quiz extends HTMLElement {
     }
 
     showResults() {
+        // Guarda las respuestas del usuario durante el quiz
+        if (!this.userAnswers) this.userAnswers = [];
+        // Construye el resumen de resultados
+        let summary = '<h4>Resumen de respuestas:</h4><ul class="list-group mb-3">';
+        this.quizData.forEach((q, i) => {
+            const userAnswer = this.userAnswers[i];
+            const correctAnswer = q.opciones[q.respuesta];
+            const userAnswerText = userAnswer !== undefined ? q.opciones[userAnswer] : '<em>No respondida</em>';
+            const isCorrect = userAnswer === q.respuesta;
+            summary += `
+                <li class="list-group-item d-flex flex-column ${isCorrect ? 'list-group-item-success' : 'list-group-item-danger'}">
+                    <strong>Pregunta ${i + 1}:</strong> ${q.pregunta}<br>
+                    <span>Tu respuesta: ${userAnswerText}</span>
+                    <span>Respuesta correcta: ${correctAnswer}</span>
+                </li>
+            `;
+        });
+        summary += '</ul>';
+
         this.quizContainer.innerHTML = `
             <div class="results">
                 <div class="result-icon">
@@ -135,6 +158,7 @@ class Quiz extends HTMLElement {
                 </div>
                 <div class="score">Your score: ${this.score}/${this.quizData.length}</div>
                 <p>${this.score > this.quizData.length / 2 ? 'Great job!' : 'Better luck next time!'}</p>
+                ${summary}
                 <button class="btn btn-primary" id="save-score-btn">Save Score</button>
                 <button class="btn btn-secondary" onclick="location.reload()">Restart Quiz</button>
             </div>
