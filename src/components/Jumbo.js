@@ -23,6 +23,11 @@ class Jumbotron extends HTMLElement {
               });
             this.dispatchEvent(messageEvent);         
         }
+        else if (event.type === 'quiz:finished') {
+            // Desactiva el range
+            const range = this.querySelector('#pi_input');
+            if (range) range.disabled = true;
+        }
     }
 
     static get styles() {
@@ -35,6 +40,7 @@ class Jumbotron extends HTMLElement {
         document.addEventListener("user:nav-cuestonarios", this);
         document.addEventListener("user:nav-cpersonalizado", this);
         document.addEventListener("tables:book-selected", this);
+        window.addEventListener('quiz:finished', this);
         this.render();
     }
 
@@ -43,6 +49,7 @@ class Jumbotron extends HTMLElement {
         document.removeEventListener("user:nav-cuestonarios", this);
         document.removeEventListener("user:nav-cpersonalizado", this);
         document.removeEventListener("tables:book-selected", this);
+        window.removeEventListener('quiz:finished', this);
     }
 
     noRange() {

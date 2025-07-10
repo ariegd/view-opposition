@@ -165,6 +165,9 @@ class Quiz extends HTMLElement {
         `;
 
         document.getElementById('save-score-btn').addEventListener('click', () => this.saveScore());
+        
+        // Lanzar evento para desactivar el range en Jumbo.js
+        window.dispatchEvent(new CustomEvent('quiz:finished'));
     }
 
     constructor() {

@@ -1,6 +1,7 @@
 # view-opposition
 Vista del proyecto relacionado con los test de oposición. Utilizando bootswatch (basic) y web componentes. 
 
+   - [cuando Una vez finalizado de realizar las question en el Quiz.js mostrar las respuestas correctas e incorrectas desacativar el range en el Jumbo.js](#pregunta-24)
    - [Una vez finalizado de realizar las question en el Quiz.js mostrar las respuestas correctas e incorrectas](#pregunta-23)
    - [cuando el usuario lance el evento user:jumbo-input no cambie de hasBooks() a hasOppositions()](#pregunta-22)
    - [tables:book-selected cuando se lance este evento crear en el jumbo.js customRange3](#pregunta-21)
@@ -25,6 +26,58 @@ Vista del proyecto relacionado con los test de oposición. Utilizando bootswatch
    - [To change value limit=5 by this.data.message](#pregunta-2)
    - [Solution why when I change input type="range" not event click in button from Cards.js](#pregunta-1)
  
+## Pregunta 24
+**cuando Una vez finalizado de realizar las question en el Quiz.js mostrar las respuestas correctas e incorrectas desacativar el range en el Jumbo.js**
+
+Para **mostrar las respuestas correctas e incorrectas** ya lo tienes implementado en tu método `showResults()`.
+
+Para **desactivar el range en el `Jumbo.js`** cuando el quiz termina, debes lanzar un evento personalizado desde Quiz.js al finalizar el quiz y escucharlo en `Jumbo.js` para desactivar el input de rango.
+
+### 1. Lanza un evento desde Quiz.js al finalizar el quiz
+
+Agrega esto al final de tu método `showResults()`:
+
+```javascript
+showResults() {
+    // ...tu código actual...
+
+    document.getElementById('save-score-btn').addEventListener('click', () => this.saveScore());
+
+    // Lanzar evento para desactivar el range en Jumbo.js
+    window.dispatchEvent(new CustomEvent('quiz:finished'));
+}
+```
+
+---
+
+### 2. Escucha el evento en `Jumbo.js` y desactiva el range
+
+En tu componente `Jumbo.js`, agrega algo como esto:
+
+```javascript
+connectedCallback() {
+    // ...otros listeners...
+    window.addEventListener('quiz:finished', this);
+    this.render();
+}
+
+disconnectedCallback() {
+    window.removeEventListener('quiz:finished', this);
+}
+
+handleEvent(event) {
+    if (event.type === 'quiz:finished') {
+        // Desactiva el range
+        const range = this.querySelector('#pi_input');
+        if (range) range.disabled = true;
+    }
+    // ...otros eventos...
+}
+```
+
+---
+
+**Con esto, al terminar el quiz, el input de rango en el jumbotron quedará desactivado automáticamente.**
  
 ## Pregunta 23
 **Una vez finalizado de realizar las question en el Quiz.js mostrar las respuestas correctas e incorrectas**
